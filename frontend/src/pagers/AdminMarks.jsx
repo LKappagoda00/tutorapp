@@ -15,7 +15,6 @@ export default function AdminMarks() {
         <div className="flex-grow flex flex-col items-center justify-start py-8 overflow-y-auto">
           <div className="bg-white/90 rounded-2xl shadow-xl p-8 w-full max-w-2xl">
             <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6 drop-shadow-lg">Marks Management</h2>
-            <p className="text-lg text-gray-700 mb-4">This is a dummy marks management page for admin. You can view or edit student marks here.</p>
             <button
               className="mb-4 px-5 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold rounded-xl shadow hover:scale-105 transition-all"
               onClick={() => navigate('/add-marks')}

@@ -9,7 +9,6 @@ export default function TeacherViewSalary() {
       <div className="flex-grow flex flex-col items-center justify-start py-8 overflow-y-auto">
         <div className="bg-white/90 rounded-2xl shadow-xl p-8 w-full max-w-2xl">
           <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6 drop-shadow-lg">My Salary</h2>
-          <p className="text-lg text-gray-700 mb-4">This is a dummy salary view page for teachers. You can see your salary details here.</p>
           <table className="w-full text-center mt-4">
             <thead>
               <tr className="text-purple-600">
