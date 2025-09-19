@@ -13,8 +13,13 @@ import AdminUsers from './pagers/AdminUsers.jsx';
 import AdminMarks from './pagers/AdminMarks.jsx';
 import StudentViewMarks from './pagers/StudentViewMarks.jsx';
 import TeacherViewSalary from './pagers/TeacherViewSalary.jsx';
+import UpdateMarks from './pagers/UpdateMarks.jsx'; 
 import UpdateSalaryForm from './pagers/UpdateSalaryForm.jsx';
 import CreateSalaryForm from './pagers/CreateSalaryForm.jsx';
+
+import AddMarks from './pagers/AddMarks.jsx';
+
+import UpdateUser from './pagers/UpdateUser.jsx';
 
 export default function App() {
   return (
@@ -33,6 +38,9 @@ export default function App() {
   <Route path="/teacher-salary" element={<TeacherViewSalary />} />
   <Route path="/create-salary" element={<CreateSalaryForm />} />
   <Route path="/update-salary" element={<UpdateSalaryForm />} />
+  <Route path="/add-marks" element={<AddMarks />} />
+  <Route path="/update-marks" element={<UpdateMarks />} />
+  <Route path="/update-user" element={<UpdateUser />} />
       </Routes>
     </Router>
   );
