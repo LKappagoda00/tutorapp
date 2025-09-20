@@ -3,11 +3,66 @@ const Payment = require('../models/Payment');
 // Create a payment
 exports.create = async (req, res) => {
   try {
-    const payment = new Payment(req.body);
-    await payment.save();
-    res.status(201).json({ message: 'Payment created', payment });
+    console.log('Payment creation request received:', req.body);
+    const { student, teacher, classId, subject, courseName, amount, notes } = req.body;
+
+    // Validate required fields
+    const missingFields = [];
+    if (!student) missingFields.push('student');
+    if (!teacher) missingFields.push('teacher');
+    if (!classId) missingFields.push('classId');
+    if (!subject) missingFields.push('subject');
+    if (!courseName) missingFields.push('courseName');
+    if (!amount) missingFields.push('amount');
+
+    if (missingFields.length > 0) {
+      console.log('Missing fields:', missingFields);
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(', ')}`
+      });
+    }
+
+    // Validate amount
+    if (amount <= 0) {
+      return res.status(400).json({
+        message: 'Amount must be greater than 0'
+      });
+    }
+
+    // Create payment object
+    const paymentData = {
+      student,
+      teacher,
+      classId,
+      subject,
+      courseName,
+      amount: Number(amount),
+      notes,
+      status: 'pending'
+    };
+
+    console.log('Creating payment with data:', paymentData);
+    const payment = new Payment(paymentData);
+
+    try {
+      await payment.save();
+      console.log('Payment saved successfully:', payment);
+    } catch (saveError) {
+      console.error('Error saving payment:', saveError);
+      throw saveError;
+    }
+    res.status(201).json({ 
+      success: true,
+      message: 'Payment created successfully', 
+      payment 
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Payment creation error:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error creating payment', 
+      error: err.message 
+    });
   }
 };
 
