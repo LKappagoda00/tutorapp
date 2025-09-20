@@ -1,14 +1,17 @@
 import React from 'react';
+import { dummySubjects, dummyExamTypes } from '../data/dummySubjects';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Sidebar from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 
 export default function AddMarks() {
+
   const navigate = useNavigate();
   // Dummy data for dropdowns
   const studentIds = ['STU001', 'STU002', 'STU003'];
-  const examTypes = ['Term Test', 'Monthly Quiz', 'Final Exam'];
+  const examTypes = dummyExamTypes;
+  const subjects = dummySubjects.map(sub => sub.name);
   const lessons = ['Algebra', 'Photosynthesis', 'World History'];
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
@@ -38,11 +41,11 @@ export default function AddMarks() {
                 </select>
               </div>
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Lesson</label>
+                <label className="block mb-2 font-semibold text-gray-700">Subject</label>
                 <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow">
-                  <option value="">Select Lesson</option>
-                  {lessons.map(lesson => (
-                    <option key={lesson} value={lesson}>{lesson}</option>
+                  <option value="">Select Subject</option>
+                  {subjects.map(subject => (
+                    <option key={subject} value={subject}>{subject}</option>
                   ))}
                 </select>
               </div>
