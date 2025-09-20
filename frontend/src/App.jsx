@@ -16,14 +16,13 @@ import UpdateMarks from './pagers/UpdateMarks.jsx';
 import UpdateSalaryForm from './pagers/UpdateSalaryForm.jsx';
 import CreateSalaryForm from './pagers/CreateSalaryForm.jsx';
 
-
 import AddMarks from './pagers/AddMarks.jsx';
-import StudentMarks from './pagers/StudentMarks.jsx';
 
 import UpdateUser from './pagers/admin/UpdateUser.jsx';
 import AdminUsers from './pagers/admin/AdminUsers.jsx';
 import StudentMakePayment from './pagers/student/StudentMakePayment.jsx';
 import Home from './pagers/Home.jsx';
+import StudentMarks from './pagers/student/StudentMarks.jsx';
 
 export default function App() {
   return (
@@ -44,9 +43,9 @@ export default function App() {
   <Route path="/create-salary" element={<CreateSalaryForm />} />
   <Route path="/update-salary" element={<UpdateSalaryForm />} />
   <Route path="/add-marks" element={<AddMarks />} />
-  <Route path="/student-marks" element={<StudentMarks />} />
   <Route path="/update-marks" element={<UpdateMarks />} />
   <Route path="/update-user/:id" element={<UpdateUser />} />
+  <Route path="/student-marks" element={<StudentMarks />} />
       </Routes>
     </Router>
   );

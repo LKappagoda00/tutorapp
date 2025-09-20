@@ -8,6 +8,15 @@ router.post('/', marksController.create);
 // Get all marks
 router.get('/', marksController.getAll);
 
+// Get marks by teacher ID
+router.get('/teacher/:teacherId', marksController.getMarksByTeacher);
+
+// Get marks by student ID
+router.get('/student/:studentId', marksController.getMarksByStudent);
+
+// Get marks by teacher AND student ID
+router.get('/teacher/:teacherId/student/:studentId', marksController.getMarksByTeacherAndStudent);
+
 // Get marks by ID
 router.get('/:id', marksController.getById);
 
