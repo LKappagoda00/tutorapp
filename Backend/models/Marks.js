@@ -6,6 +6,11 @@ const marksSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  teacher: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   examType: {
     type: String,
     required: true
