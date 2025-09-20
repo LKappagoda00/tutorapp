@@ -14,11 +14,14 @@ export default function Sidebar({ role }) {
     ];
   } else if (role === 'student') {
     buttons = [
-      { label: 'Payment', to: '/student-payment' },
+      { label: 'View Marks', to: '/student-marks' },
+      
     ];
   } else if (role === 'teacher') {
     buttons = [
       { label: 'View Salary', to: '/teacher-salary' },
+      { label: 'Marks', to: '/add-marks' },
+
     ];
   }
 
