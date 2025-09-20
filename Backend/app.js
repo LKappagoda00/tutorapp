@@ -1,5 +1,4 @@
 
-
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -13,11 +12,13 @@ app.get('/', (req, res) => {
   res.send('Welcome to the Product API');
 });
 
-
 // User management routes
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 
+// Auth routes
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
 
 
 app.listen(PORT, () => {
