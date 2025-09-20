@@ -1,6 +1,24 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+// Get teacher's subjects
+exports.getTeacherSubjects = async (req, res) => {
+  try {
+    const teacher = await User.findOne({
+      _id: req.params.teacherId,
+      role: 'teacher'
+    }).select('subject');
+
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    res.json({ subject: teacher.subject });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Register user
 exports.register = async (req, res) => {
   try {
@@ -25,10 +43,12 @@ exports.register = async (req, res) => {
   }
 };
 
-// Get all users
+// Get all users (with role filter support)
 exports.getAll = async (req, res) => {
   try {
-    const users = await User.find();
+    const { role } = req.query; // e.g. ?role=teacher
+    const filter = role ? { role } : {};
+    const users = await User.find(filter);
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });

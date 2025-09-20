@@ -15,10 +15,13 @@ function adminOnly(req, res, next) {
 router.post('/register', userController.register);
 
 // Get all users (admin only)
-router.get('/', authMiddleware, adminOnly, userController.getAll);
+router.get('/', userController.getAll);
 
 // Get user by ID
 router.get('/:id', userController.getById);
+
+// Get teacher's subjects
+router.get('/:teacherId/subjects', authMiddleware, userController.getTeacherSubjects);
 
 // Update user
 router.put('/:id', userController.update);
