@@ -4,6 +4,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Sidebar from '../../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 export default function AdminUsers() {
   const navigate = useNavigate();
@@ -96,6 +97,64 @@ export default function AdminUsers() {
       setError('Error connecting to server');
     }
   };
+
+  const exportToExcel = (data, fileName, headers) => {
+    // Convert data to worksheet format
+    const worksheet = XLSX.utils.json_to_sheet(data.map(item => {
+      const row = {};
+      headers.forEach(header => {
+        if (header.key === 'dob') {
+          row[header.label] = item[header.key] ? new Date(item[header.key]).toLocaleDateString() : '';
+        } else {
+          row[header.label] = item[header.key];
+        }
+      });
+      return row;
+    }));
+
+    // Create workbook and add worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Generate Excel file and trigger download
+    XLSX.writeFile(workbook, `${fileName}_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const exportTeachers = () => {
+    const teacherHeaders = [
+      { key: 'fullName', label: 'Full Name' },
+      { key: 'nic', label: 'NIC' },
+      { key: 'subject', label: 'Subject' },
+      { key: 'bankName', label: 'Bank Name' },
+      { key: 'accountNumber', label: 'Account Number' },
+      { key: 'branch', label: 'Branch' },
+      { key: 'beneficiaryName', label: 'Beneficiary Name' }
+    ];
+    const teacherData = users.filter(user => user.role === 'teacher');
+    exportToExcel(teacherData, 'Teachers_Report', teacherHeaders);
+  };
+
+  const exportStudents = () => {
+    const studentHeaders = [
+      { key: 'fullName', label: 'Full Name' },
+      { key: 'userName', label: 'Username' },
+      { key: 'dob', label: 'Date of Birth' },
+      { key: 'address', label: 'Address' },
+      { key: 'phone', label: 'Phone' },
+      { key: 'isClassStudent', label: 'Class Student' }
+    ];
+    const studentData = users.filter(user => user.role === 'student');
+    exportToExcel(studentData, 'Students_Report', studentHeaders);
+  };
+
+  const exportStaff = () => {
+    const staffHeaders = [
+      { key: 'fullName', label: 'Full Name' },
+      { key: 'role', label: 'Role' }
+    ];
+    const staffData = users.filter(user => ['admin', 'library', 'manager'].includes(user.role));
+    exportToExcel(staffData, 'Staff_Report', staffHeaders);
+  };
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
       <Header />
@@ -113,7 +172,18 @@ export default function AdminUsers() {
               <div className="space-y-8">
                 {/* Teachers Table */}
                 <div>
-                  <h3 className="text-xl font-bold text-purple-600 mb-4">Teachers</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-purple-600">Teachers</h3>
+                    <button
+                      onClick={exportTeachers}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold shadow hover:bg-purple-700 transition-all flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                      Export Teachers
+                    </button>
+                  </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-center">
                       <thead className="bg-purple-100">
@@ -159,7 +229,18 @@ export default function AdminUsers() {
 
                 {/* Students Table */}
                 <div>
-                  <h3 className="text-xl font-bold text-blue-600 mb-4">Students</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-blue-600">Students</h3>
+                    <button
+                      onClick={exportStudents}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition-all flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                      Export Students
+                    </button>
+                  </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-center">
                       <thead className="bg-blue-100">
@@ -205,7 +286,18 @@ export default function AdminUsers() {
 
                 {/* Other Staff Table (Admin, Library, Manager) */}
                 <div>
-                  <h3 className="text-xl font-bold text-green-600 mb-4">Other Staff</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-green-600">Other Staff</h3>
+                    <button
+                      onClick={exportStaff}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold shadow hover:bg-green-700 transition-all flex items-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                      Export Staff
+                    </button>
+                  </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-center">
                       <thead className="bg-green-100">

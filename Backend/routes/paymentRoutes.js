@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // Create payment
-router.post('/', paymentController.create);
+router.post('/', authMiddleware, paymentController.create);
 
 // Get all payments
 router.get('/', paymentController.getAll);

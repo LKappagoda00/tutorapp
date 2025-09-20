@@ -14,7 +14,7 @@ exports.create = async (req, res) => {
 // Get all marks
 exports.getAll = async (req, res) => {
   try {
-    const allMarks = await Marks.find().populate('student');
+    const allMarks = await Marks.find().populate('student teacher');
     res.json(allMarks);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -24,7 +24,7 @@ exports.getAll = async (req, res) => {
 // Get marks by ID
 exports.getById = async (req, res) => {
   try {
-    const marks = await Marks.findById(req.params.id).populate('student');
+    const marks = await Marks.findById(req.params.id).populate('student teacher');
     if (!marks) return res.status(404).json({ error: 'Marks not found' });
     res.json(marks);
   } catch (err) {

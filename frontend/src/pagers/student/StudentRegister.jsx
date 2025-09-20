@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 export default function StudentRegister() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -13,16 +14,63 @@ export default function StudentRegister() {
     password: '',
     confirmPassword: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // You can add validation here
-    navigate('/');
+    setError('');
+    setLoading(true);
+
+    // Basic validation
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+    if (form.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      setLoading(false);
+      return;
+    }
+
+    // Prepare data for API
+    const payload = {
+      fullName: form.fullName,
+      userName: form.userName,
+      dob: form.dob,
+      address: form.address,
+      phone: form.phone,
+      isClassStudent: form.isClassStudent,
+      password: form.password,
+      confirmPassword: form.confirmPassword,
+      role: 'student',
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        navigate('/'); // Go to login page
+      } else {
+        setError(data.error || 'Registration failed');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +80,11 @@ export default function StudentRegister() {
         <div className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 flex flex-col items-center animate-fade-in">
           <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6 drop-shadow-lg">Student Register</h2>
           <form className="flex flex-col gap-5 w-full" onSubmit={handleSubmit}>
+            {error && (
+              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center mb-2">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block mb-2 font-semibold text-gray-700" htmlFor="fullName">Full Name</label>
               <input
@@ -151,9 +204,10 @@ export default function StudentRegister() {
             </div>
             <button
               type="submit"
-              className="w-full py-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-transform duration-200 text-lg tracking-wide mt-2"
+              disabled={loading}
+              className={`w-full py-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-transform duration-200 text-lg tracking-wide mt-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              Register
+              {loading ? 'Registering...' : 'Register'}
             </button>
           </form>
         </div>
