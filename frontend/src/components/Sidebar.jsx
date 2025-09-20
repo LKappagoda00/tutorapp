@@ -14,7 +14,7 @@ export default function Sidebar({ role }) {
     ];
   } else if (role === 'student') {
     buttons = [
-      { label: 'View Marks', to: '/student-marks' },
+      { label: 'Payment', to: '/student-payment' },
       
     ];
   } else if (role === 'teacher') {

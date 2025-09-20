@@ -19,7 +19,7 @@ export default function Login() {
       if (userRole === "admin") {
         navigate("/admin-dashboard");
       } else if (userRole === "student") {
-        navigate("/student-dashboard");
+        navigate("/student-marks");
       } else if (userRole === "teacher") {
         navigate("/teacher-dashboard");
       }
@@ -86,7 +86,7 @@ export default function Login() {
         if (userRole === "admin") {
           navigate("/admin-dashboard");
         } else if (userRole === "student") {
-          navigate("/student-dashboard");
+          navigate("/student-marks");
         } else if (userRole === "teacher") {
           navigate("/teacher-dashboard");
         } else {
