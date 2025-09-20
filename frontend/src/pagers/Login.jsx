@@ -1,31 +1,106 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getStoredToken, clearAuthData } from '../utils/auth';
 
 export default function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Hardcoded credentials
-  const users = [
-    { username: 'admin', password: 'admin123', role: 'admin' },
-    { username: 'student', password: 'student123', role: 'student' },
-    { username: 'teacher', password: 'teacher123', role: 'teacher' },
-  ];
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const found = users.find(
-      (u) => u.username === username && u.password === password
-    );
-    if (found) {
-      setError('');
-      if (found.role === 'admin') navigate('/admin-dashboard');
-      else if (found.role === 'student') navigate('/student-dashboard');
-      else if (found.role === 'teacher') navigate('/teacher-dashboard');
+  // Check for existing valid token on mount
+  useEffect(() => {
+    const token = getStoredToken();
+    if (token) {
+      const userData = JSON.parse(localStorage.getItem('user') || '{}');
+      const userRole = userData.role;
+      
+      if (userRole === "admin") {
+        navigate("/admin-dashboard");
+      } else if (userRole === "student") {
+        navigate("/student-dashboard");
+      } else if (userRole === "teacher") {
+        navigate("/teacher-dashboard");
+      }
     } else {
-      setError('Invalid username or password');
+      clearAuthData(); // Clear any invalid data
+    }
+  }, [navigate]);
+
+  // Authenticate with backend
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+    
+    // Enhanced validation
+    if (!username.trim()) {
+      setError("Username is required");
+      return;
+    }
+    
+    if (!password.trim()) {
+      setError("Password is required");
+      return;
+    }
+    
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Backend returns { message, token, user }
+        // Store token and user data for session management
+        const { token, user } = data;
+        
+        // Store token in localStorage with expiration
+        const tokenData = {
+          value: token,
+          expiry: new Date().getTime() + (24 * 60 * 60 * 1000) // 24 hours from now
+        };
+        localStorage.setItem('token', JSON.stringify(tokenData));
+        
+        // Store minimal user data
+        const userData = {
+          id: user._id,
+          role: user.role,
+          username: user.userName || user.nic
+        };
+        localStorage.setItem('user', JSON.stringify(userData));
+        
+        // Navigate based on user role
+        const userRole = user.role;
+        if (userRole === "admin") {
+          navigate("/admin-dashboard");
+        } else if (userRole === "student") {
+          navigate("/student-dashboard");
+        } else if (userRole === "teacher") {
+          navigate("/teacher-dashboard");
+        } else {
+          navigate("/"); // fallback
+        }
+      } else {
+        // Backend returns { error } for failed authentication
+        setError(data.error || "Invalid username or password");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Network error. Please check if the server is running and try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -66,28 +141,36 @@ export default function Login() {
                 autoComplete="current-password"
               />
             </div>
-            {error && <div className="text-red-500 text-center font-semibold">{error}</div>}
+            {error && (
+              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                <p className="text-center">{error}</p>
+              </div>
+            )}
             <button
               type="submit"
-              className="w-full py-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-transform duration-200 text-lg tracking-wide"
+              disabled={isLoading}
+              className={`w-full py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-transform duration-200 text-lg tracking-wide ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              Login
+              {isLoading ? 'Logging in...' : 'Login'}
             </button>
+
+            <div className="flex justify-center gap-4 w-full mt-6">
+              <button
+                type="button"
+                className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition font-semibold w-1/2"
+                onClick={() => navigate('/student-register')}
+              >
+                Student Register
+              </button>
+              <button
+                type="button"
+                className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition font-semibold w-1/2"
+                onClick={() => navigate('/teacher-register')}
+              >
+                Teacher Register
+              </button>
+            </div>
           </form>
-          <div className="flex justify-center mt-8 gap-4 w-full">
-            <button
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition font-semibold w-1/2"
-              onClick={() => navigate('/student-register')}
-            >
-              User Register
-            </button>
-            <button
-              className="px-6 py-3 bg-green-500 text-white rounded-lg shadow hover:bg-green-600 transition font-semibold w-1/2"
-              onClick={() => navigate('/teacher-register')}
-            >
-              Teacher Register
-            </button>
-          </div>
         </div>
       </div>
     </div>

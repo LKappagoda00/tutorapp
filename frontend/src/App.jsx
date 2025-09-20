@@ -9,7 +9,7 @@ import AdminDashboard from './pagers/AdminDashboard.jsx';
 import StudentDashboard from './pagers/StudentDashboard.jsx';
 import TeacherDashboard from './pagers/TeacherDashboard.jsx';
 import AdminSalary from './pagers/AdminSalary.jsx';
-import AdminUsers from './pagers/AdminUsers.jsx';
+
 import AdminMarks from './pagers/AdminMarks.jsx';
 import StudentViewMarks from './pagers/StudentViewMarks.jsx';
 import TeacherViewSalary from './pagers/TeacherViewSalary.jsx';
@@ -20,6 +20,7 @@ import CreateSalaryForm from './pagers/CreateSalaryForm.jsx';
 import AddMarks from './pagers/AddMarks.jsx';
 
 import UpdateUser from './pagers/UpdateUser.jsx';
+import AdminUsers from './pagers/admin/AdminUsers.jsx';
 
 export default function App() {
   return (
