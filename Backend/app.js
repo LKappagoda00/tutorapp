@@ -8,10 +8,6 @@ const MONGO_URI = process.env.MONGO_URI;
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Welcome to the Product API');
-});
-
 // User management routes
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
