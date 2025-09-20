@@ -21,12 +21,14 @@ import AddMarks from './pagers/AddMarks.jsx';
 import UpdateUser from './pagers/admin/UpdateUser.jsx';
 import AdminUsers from './pagers/admin/AdminUsers.jsx';
 import StudentMakePayment from './pagers/student/StudentMakePayment.jsx';
+import Home from './pagers/Home.jsx';
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/student-register" element={<StudentRegister />} />
         <Route path="/teacher-register" element={<TeacherRegister />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
