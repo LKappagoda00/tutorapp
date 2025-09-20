@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { dummySubjects, dummyExamTypes } from '../data/dummySubjects';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -8,11 +8,20 @@ import { useNavigate } from 'react-router-dom';
 export default function AddMarks() {
 
   const navigate = useNavigate();
-  // Dummy data for dropdowns
-  const studentIds = [];
+  // Student list state
+  const [students, setStudents] = useState([]);
   const examTypes = dummyExamTypes;
   const subjects = dummySubjects.map(sub => sub.name);
   // Form state
+  // Get teacher id from localStorage (expects JSON with id property)
+  let teacherId = '';
+  try {
+    const teacherRaw = localStorage.getItem('user');
+    if (teacherRaw) {
+      const teacherObj = JSON.parse(teacherRaw);
+      teacherId = teacherObj.id || teacherObj._id || '';
+    }
+  } catch {}
   const [form, setForm] = useState({
     studentId: '',
     examType: '',
@@ -20,6 +29,17 @@ export default function AddMarks() {
     marks: '',
     note: ''
   });
+
+  useEffect(() => {
+    // Fetch students from API
+    fetch('http://localhost:5000/api/users')
+      .then(res => res.json())
+      .then(data => {
+        // Expecting data to be an array of user objects with id and name
+        setStudents(data.filter(u => u.role === 'student'));
+      })
+      .catch(() => setStudents([]));
+  }, []);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -37,7 +57,8 @@ export default function AddMarks() {
           examType: form.examType,
           lesson: form.subject,
           marks: form.marks,
-          note: form.note
+          note: form.note,
+          teacher: teacherId
         })
       });
       if (res.ok) {
@@ -60,16 +81,22 @@ export default function AddMarks() {
             <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6 drop-shadow-lg text-center">Add Marks</h2>
             <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
               <div>
-                <label className="block mb-2 font-semibold text-gray-700">Student ID</label>
-                <input
-                  type="text"
+                <label className="block mb-2 font-semibold text-gray-700">Student</label>
+                <select
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow"
-                  placeholder="Enter Student ID"
                   name="studentId"
                   value={form.studentId}
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select Student</option>
+                  {students.map(student => (
+                    <option key={student._id || student.id} value={student._id || student.id}>
+                      {student.fullName || student.name || student.id}
+                    </option>
+                  ))}
+                </select>
               </div>
+
               <div>
                 <label className="block mb-2 font-semibold text-gray-700">Exam Type</label>
                 <select
