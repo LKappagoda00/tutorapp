@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -6,6 +5,8 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
+
+app.use(express.json());
 
 // CORS configuration to allow frontend requests
 app.use(cors({
@@ -15,7 +16,15 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+app.get('/', (req, res) => {
+  res.send('Welcome to the Product API');
+});
+// Marks routes
+const marksRoutes = require('./routes/marksRoutes');
+app.use('/api/marks', marksRoutes);
+// Payment routes
+const paymentRoutes = require('./routes/paymentRoutes');
+app.use('/api/payments', paymentRoutes);
 
 // User management routes
 const userRoutes = require('./routes/userRoutes');
