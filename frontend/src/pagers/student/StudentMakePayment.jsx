@@ -1,9 +1,12 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getStoredToken, getStoredUser } from '../../utils/auth';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
 export default function StudentMakePayment() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     teacher: '',
     classId: '',
@@ -19,7 +22,15 @@ export default function StudentMakePayment() {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/users?role=teacher');
+        const token = getStoredToken();
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+        const response = await fetch('http://localhost:5000/api/users?role=teacher', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.message || 'Failed to fetch teachers');
@@ -101,24 +112,20 @@ export default function StudentMakePayment() {
     }
 
     try {
-      // Get the student ID from localStorage user data
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      const studentId = userData.id;
-      const token = JSON.parse(localStorage.getItem('token') || '{}').value;
+      const userData = getStoredUser();
+      const token = getStoredToken();
       
-      if (!studentId) {
+      if (!userData || !userData.id) {
+        navigate('/login');
         throw new Error('User ID not found. Please login again.');
       }
 
       if (!token) {
+        navigate('/login');
         throw new Error('Authentication token not found. Please login again.');
       }
 
-      // Check if token is expired
-      const tokenData = JSON.parse(localStorage.getItem('token') || '{}');
-      if (tokenData.expiry && new Date().getTime() > tokenData.expiry) {
-        throw new Error('Session expired. Please login again.');
-      }
+      const studentId = userData.id;
 
       const paymentData = {
         ...formData,
@@ -133,10 +140,10 @@ export default function StudentMakePayment() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          ...formData,
+          ...paymentData,
           student: studentId,
           amount: Number(formData.amount),
           status: 'pending'
@@ -167,28 +174,28 @@ export default function StudentMakePayment() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
       <Header />
-      <div className="flex-grow flex flex-col items-center justify-start py-8 overflow-y-auto">
-        <div className="bg-white/90 rounded-2xl shadow-xl p-8 w-full max-w-2xl">
-          <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6 drop-shadow-lg">Make Payment</h2>
+      <div className="flex flex-col items-center justify-start flex-grow py-8 overflow-y-auto">
+        <div className="w-full max-w-2xl p-8 shadow-xl bg-white/90 rounded-2xl">
+          <h2 className="mb-6 text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 drop-shadow-lg">Make Payment</h2>
           
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block mb-2 text-sm font-bold text-gray-700">
                 Select Teacher
               </label>
               <select
                 name="teacher"
                 value={formData.teacher}
                 onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                 required
               >
                 <option value="">Select a teacher</option>
@@ -201,7 +208,7 @@ export default function StudentMakePayment() {
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block mb-2 text-sm font-bold text-gray-700">
                 Class ID
               </label>
               <input
@@ -209,13 +216,13 @@ export default function StudentMakePayment() {
                 name="classId"
                 value={formData.classId}
                 onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block mb-2 text-sm font-bold text-gray-700">
                 Subject
               </label>
               <input
@@ -223,14 +230,14 @@ export default function StudentMakePayment() {
                 name="subject"
                 value={formData.subject}
                 onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-100"
+                className="w-full px-3 py-2 leading-tight text-gray-700 bg-gray-100 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                 readOnly
                 required
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block mb-2 text-sm font-bold text-gray-700">
                 Course Name
               </label>
               <input
@@ -238,13 +245,13 @@ export default function StudentMakePayment() {
                 name="courseName"
                 value={formData.courseName}
                 onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block mb-2 text-sm font-bold text-gray-700">
                 Amount (Rs.)
               </label>
               <input
@@ -252,20 +259,20 @@ export default function StudentMakePayment() {
                 name="amount"
                 value={formData.amount}
                 onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label className="block mb-2 text-sm font-bold text-gray-700">
                 Notes (Optional)
               </label>
               <textarea
                 name="notes"
                 value={formData.notes}
                 onChange={handleChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                 rows="3"
               />
             </div>

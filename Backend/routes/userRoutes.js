@@ -17,11 +17,19 @@ router.post('/register', userController.register);
 // Get all users (admin only)
 router.get('/', userController.getAll);
 
+
+// Get logged-in teacher profile
+router.get('/me', authMiddleware, userController.getMe);
+
 // Get user by ID
 router.get('/:id', userController.getById);
 
 // Get teacher's subjects
 router.get('/:teacherId/subjects', authMiddleware, userController.getTeacherSubjects);
+
+
+// Update logged-in teacher profile
+router.put('/me', authMiddleware, userController.updateMe);
 
 // Update user
 router.put('/:id', userController.update);

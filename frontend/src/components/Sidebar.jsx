@@ -15,6 +15,7 @@ export default function Sidebar({ role }) {
   } else if (role === 'student') {
     buttons = [
       { label: 'Payment', to: '/student-payment' },
+      { label: 'Mark analysis Report', to: '/marks-analysis' },
       
     ];
   } else if (role === 'teacher') {
@@ -26,13 +27,13 @@ export default function Sidebar({ role }) {
   }
 
   return (
-    <aside className="w-56 min-h-full bg-white/80 shadow-xl rounded-3xl p-6 flex flex-col gap-6 mt-8 ml-4">
-      <nav className="flex flex-col gap-4 h-full flex-1">
+    <aside className="flex flex-col w-56 min-h-full gap-6 p-6 mt-8 ml-4 shadow-xl bg-white/80 rounded-3xl">
+      <nav className="flex flex-col flex-1 h-full gap-4">
         {buttons.map((btn, idx) => (
           <button
             key={btn.label}
             onClick={() => navigate(btn.to)}
-            className="sidebar-btn wow-btn flex-1 min-h-0"
+            className="flex-1 min-h-0 sidebar-btn wow-btn"
             style={{ minHeight: 0 }}
           >
             {btn.label}

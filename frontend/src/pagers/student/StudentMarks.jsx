@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Sidebar from '../../components/Sidebar';
+import StudentProfile from './studentprofile.jsx';
 
 export default function StudentMarks() {
   const [marks, setMarks] = useState([]);
@@ -62,24 +63,26 @@ export default function StudentMarks() {
   }, [studentId, selectedTeacher]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
       <Header />
-      <div className="flex-grow flex flex-row">
+      <div className="flex flex-row flex-grow">
         <Sidebar role="student" />
-        <div className="flex-grow flex flex-col items-center justify-center py-8">
-          <div className="bg-white/90 rounded-2xl shadow-xl p-8 w-full max-w-2xl">
-            <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6 drop-shadow-lg text-center">My Marks</h2>
+        <div className="flex flex-col items-center justify-center flex-grow py-8">
+           
+          <div className="w-full max-w-2xl p-8 shadow-xl bg-white/90 rounded-2xl">
+            <StudentProfile />
+            <h2 className="mb-6 text-3xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 drop-shadow-lg">My Marks</h2>
             
             {/* Teacher Selection Dropdown */}
             <div className="mb-6">
-              <label htmlFor="teacher" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="teacher" className="block mb-2 text-sm font-medium text-gray-700">
                 Filter by Teacher
               </label>
               <select
                 id="teacher"
                 value={selectedTeacher}
                 onChange={(e) => setSelectedTeacher(e.target.value)}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md"
+                className="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                 disabled={loadingTeachers}
               >
                 <option value="">All Teachers</option>
@@ -96,7 +99,7 @@ export default function StudentMarks() {
             ) : marks.length === 0 ? (
               <div className="text-lg text-gray-600">No marks found.</div>
             ) : (
-              <table className="w-full text-center mt-4">
+              <table className="w-full mt-4 text-center">
                 <thead>
                   <tr className="text-purple-600">
                     <th className="py-2">Teacher</th>
