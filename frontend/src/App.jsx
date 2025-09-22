@@ -23,6 +23,12 @@ import AdminUsers from './pagers/admin/AdminUsers.jsx';
 import StudentMakePayment from './pagers/student/StudentMakePayment.jsx';
 import Home from './pagers/Home.jsx';
 import StudentMarks from './pagers/student/StudentMarks.jsx';
+import MarksAnalysis from './pagers/student/MarksAnalysis.jsx';
+import StudentProfile from './pagers/student/studentprofile.jsx';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 export default function App() {
   return (
@@ -46,7 +52,10 @@ export default function App() {
   <Route path="/update-marks" element={<UpdateMarks />} />
   <Route path="/update-user/:id" element={<UpdateUser />} />
   <Route path="/student-marks" element={<StudentMarks />} />
+  <Route path="/marks-analysis" element={<MarksAnalysis />} />
+  <Route path="/student-profile" element={<StudentProfile />} />
       </Routes>
+      <ToastContainer position="top-right" />
     </Router>
   );
 }

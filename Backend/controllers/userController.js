@@ -1,3 +1,28 @@
+// Get logged-in teacher profile
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.role !== 'teacher') return res.status(403).json({ error: 'Access denied: Only teachers can access this endpoint.' });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Update logged-in teacher profile
+exports.updateMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.role !== 'teacher') return res.status(403).json({ error: 'Access denied: Only teachers can update this endpoint.' });
+    Object.assign(user, req.body);
+    await user.save();
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
