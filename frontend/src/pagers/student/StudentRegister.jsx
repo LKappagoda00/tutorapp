@@ -62,7 +62,7 @@ export default function StudentRegister() {
       });
       const data = await response.json();
       if (response.ok) {
-        navigate('/'); // Go to login page
+        navigate('/login'); // Go to login page
       } else {
         setError(data.error || 'Registration failed');
       }
@@ -74,14 +74,14 @@ export default function StudentRegister() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
       <div className="relative w-full max-w-lg">
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-blue-400 via-purple-400 to-pink-400 blur-2xl opacity-40 animate-pulse"></div>
-        <div className="relative z-10 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-10 flex flex-col items-center animate-fade-in">
-          <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 mb-6 drop-shadow-lg">Student Register</h2>
-          <form className="flex flex-col gap-5 w-full" onSubmit={handleSubmit}>
+        <div className="relative z-10 flex flex-col items-center p-10 shadow-2xl bg-white/90 backdrop-blur-xl rounded-3xl animate-fade-in">
+          <h2 className="mb-6 text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 drop-shadow-lg">Student Register</h2>
+          <form className="flex flex-col w-full gap-5" onSubmit={handleSubmit}>
             {error && (
-              <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center mb-2">
+              <div className="p-3 mb-2 text-center text-red-700 bg-red-100 border border-red-400 rounded-lg">
                 {error}
               </div>
             )}
@@ -93,7 +93,7 @@ export default function StudentRegister() {
                 type="text"
                 value={form.fullName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow"
+                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter your full name"
                 required
               />
@@ -106,7 +106,7 @@ export default function StudentRegister() {
                 type="text"
                 value={form.userName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow"
+                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter your user name"
                 required
               />
@@ -119,7 +119,7 @@ export default function StudentRegister() {
                 type="date"
                 value={form.dob}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow"
+                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
                 required
               />
             </div>
@@ -131,7 +131,7 @@ export default function StudentRegister() {
                 type="text"
                 value={form.address}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow"
+                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter your address"
                 required
               />
@@ -144,7 +144,7 @@ export default function StudentRegister() {
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition shadow"
+                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter your phone number"
                 required
               />
@@ -159,7 +159,7 @@ export default function StudentRegister() {
                     value="yes"
                     checked={form.isClassStudent === 'yes'}
                     onChange={handleChange}
-                    className="form-radio text-blue-500"
+                    className="text-blue-500 form-radio"
                   />
                   <span className="ml-2">Yes</span>
                 </label>
@@ -170,7 +170,7 @@ export default function StudentRegister() {
                     value="no"
                     checked={form.isClassStudent === 'no'}
                     onChange={handleChange}
-                    className="form-radio text-pink-500"
+                    className="text-pink-500 form-radio"
                   />
                   <span className="ml-2">No</span>
                 </label>
@@ -184,7 +184,7 @@ export default function StudentRegister() {
                 type="password"
                 value={form.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 transition shadow"
+                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-pink-400"
                 placeholder="Enter your password"
                 required
               />
@@ -197,7 +197,7 @@ export default function StudentRegister() {
                 type="password"
                 value={form.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 transition shadow"
+                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-pink-400"
                 placeholder="Confirm your password"
                 required
               />
