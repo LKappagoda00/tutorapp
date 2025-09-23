@@ -49,7 +49,7 @@ export default function App() {
   <Route path="/create-salary" element={<CreateSalaryForm />} />
   <Route path="/update-salary" element={<UpdateSalaryForm />} />
   <Route path="/add-marks" element={<AddMarks />} />
-  <Route path="/update-marks" element={<UpdateMarks />} />
+  <Route path="/update-marks/:id" element={<UpdateMarks />} />
   <Route path="/update-user/:id" element={<UpdateUser />} />
   <Route path="/student-marks" element={<StudentMarks />} />
   <Route path="/marks-analysis" element={<MarksAnalysis />} />
