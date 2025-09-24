@@ -16,10 +16,16 @@ export default function StudentRegister() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -27,7 +33,69 @@ export default function StudentRegister() {
     setError('');
     setLoading(true);
 
-    // Basic validation
+    // Validation
+    const errors = {};
+    
+    // Full Name validation
+    if (!form.fullName.trim() || form.fullName.trim().length < 2) {
+      errors.fullName = 'Full name must be at least 2 characters';
+    }
+    
+    // User Name validation
+    if (!form.userName.trim() || form.userName.trim().length < 3) {
+      errors.userName = 'Username must be at least 3 characters';
+    }
+    
+    // Date of Birth validation
+    if (!form.dob) {
+      errors.dob = 'Date of birth is required';
+    } else {
+      const today = new Date();
+      const dobDate = new Date(form.dob);
+      if (dobDate > today) {
+        errors.dob = 'Date of birth cannot be in the future';
+      }
+      // Check if age is reasonable (e.g., at least 5 years old)
+      const age = today.getFullYear() - dobDate.getFullYear();
+      if (age < 5) {
+        errors.dob = 'Student must be at least 5 years old';
+      }
+    }
+    
+    // Address validation
+    if (!form.address.trim() || form.address.trim().length < 5) {
+      errors.address = 'Address must be at least 5 characters';
+    }
+    
+    // Phone validation
+    if (!form.phone.trim()) {
+      errors.phone = 'Phone number is required';
+    } else if (!/^\d{10,}$/.test(form.phone.replace(/\s/g, ''))) {
+      errors.phone = 'Phone number must be at least 10 digits';
+    }
+    
+    // Password validation
+    if (!form.password) {
+      errors.password = 'Password is required';
+    } else if (form.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+    
+    // Confirm Password validation
+    if (!form.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password';
+    } else if (form.password !== form.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+    }
+
+    setFieldErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      setLoading(false);
+      return;
+    }
+
+    // Basic validation (keeping existing for backward compatibility)
     if (form.password !== form.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -93,10 +161,17 @@ export default function StudentRegister() {
                 type="text"
                 value={form.fullName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                  fieldErrors.fullName 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-300 focus:ring-blue-400'
+                }`}
                 placeholder="Enter your full name"
                 required
               />
+              {fieldErrors.fullName && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.fullName}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2 font-semibold text-gray-700" htmlFor="userName">User Name</label>
@@ -106,10 +181,17 @@ export default function StudentRegister() {
                 type="text"
                 value={form.userName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                  fieldErrors.userName 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-300 focus:ring-blue-400'
+                }`}
                 placeholder="Enter your user name"
                 required
               />
+              {fieldErrors.userName && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.userName}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2 font-semibold text-gray-700" htmlFor="dob">Date of Birth</label>
@@ -119,9 +201,16 @@ export default function StudentRegister() {
                 type="date"
                 value={form.dob}
                 onChange={handleChange}
-                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                  fieldErrors.dob 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-300 focus:ring-blue-400'
+                }`}
                 required
               />
+              {fieldErrors.dob && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.dob}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2 font-semibold text-gray-700" htmlFor="address">Address</label>
@@ -131,10 +220,17 @@ export default function StudentRegister() {
                 type="text"
                 value={form.address}
                 onChange={handleChange}
-                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                  fieldErrors.address 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-300 focus:ring-blue-400'
+                }`}
                 placeholder="Enter your address"
                 required
               />
+              {fieldErrors.address && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.address}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2 font-semibold text-gray-700" htmlFor="phone">Phone Number</label>
@@ -144,10 +240,17 @@ export default function StudentRegister() {
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                  fieldErrors.phone 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-300 focus:ring-blue-400'
+                }`}
                 placeholder="Enter your phone number"
                 required
               />
+              {fieldErrors.phone && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.phone}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2 font-semibold text-gray-700">Class Student?</label>
@@ -184,10 +287,17 @@ export default function StudentRegister() {
                 type="password"
                 value={form.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-pink-400"
+                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                  fieldErrors.password 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-300 focus:ring-pink-400'
+                }`}
                 placeholder="Enter your password"
                 required
               />
+              {fieldErrors.password && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.password}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2 font-semibold text-gray-700" htmlFor="confirmPassword">Confirm Password</label>
@@ -197,10 +307,17 @@ export default function StudentRegister() {
                 type="password"
                 value={form.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-pink-400"
+                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                  fieldErrors.confirmPassword 
+                    ? 'border-red-500 focus:ring-red-400' 
+                    : 'border-gray-300 focus:ring-pink-400'
+                }`}
                 placeholder="Confirm your password"
                 required
               />
+              {fieldErrors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-500">{fieldErrors.confirmPassword}</p>
+              )}
             </div>
             <button
               type="submit"
