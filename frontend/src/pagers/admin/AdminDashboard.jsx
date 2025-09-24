@@ -1,10 +1,10 @@
 import React from 'react';
 
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
-import Sidebar from '../components/Sidebar';
-import DummyInstituteData from '../components/DummyInstituteData';
+import Sidebar from '../../components/Sidebar';
+import DummyInstituteData from '../../components/DummyInstituteData';
 
 export default function AdminDashboard() {
   return (
