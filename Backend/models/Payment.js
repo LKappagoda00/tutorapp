@@ -27,6 +27,14 @@ const paymentSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  adminCommission: {
+    type: Number,
+    default: 0
+  },
+  teacherPayment: {
+    type: Number,
+    default: 0
+  },
   paymentDate: {
     type: Date,
     default: Date.now

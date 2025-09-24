@@ -73,9 +73,12 @@ exports.getAll = async (req, res) => {
   try {
     const { role } = req.query; // e.g. ?role=teacher
     const filter = role ? { role } : {};
+    console.log('Fetching users with filter:', filter);
     const users = await User.find(filter);
+    console.log('Found users:', users.length);
     res.json(users);
   } catch (err) {
+    console.error('Error fetching users:', err);
     res.status(500).json({ error: err.message });
   }
 };

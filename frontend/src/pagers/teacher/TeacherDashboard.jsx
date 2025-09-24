@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { getStoredToken } from '../utils/auth';
+import { getStoredToken } from '../../utils/auth';
 
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 
-import Sidebar from '../components/Sidebar';
-import TeacherStats from '../components/TeacherStats';
+import Sidebar from '../../components/Sidebar';
+import TeacherStats from '../../components/TeacherStats';
 
 export default function TeacherDashboard() {
   const navigate = useNavigate();
