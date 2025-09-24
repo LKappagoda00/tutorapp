@@ -1,73 +1,70 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Home,
+  DollarSign,
+  Users,
+  BookOpen,
+  BarChart2,
+} from "lucide-react";
 
 export default function Sidebar({ role }) {
   const navigate = useNavigate();
 
-  // Determine button count for flex-grow
   let buttons = [];
-  if (role === 'admin') {
+  if (role === "admin") {
     buttons = [
-      { label: 'Salary', to: '/admin-salary' },
-      // { label: 'Marks', to: '/admin-marks' },
-      { label: 'Users', to: '/admin-users' },
+      { label: "Salary", to: "/admin-salary", icon: DollarSign },
+      { label: "Users", to: "/admin-users", icon: Users },
     ];
-  } else if (role === 'student') {
+  } else if (role === "student") {
     buttons = [
-      { label: 'Payment', to: '/student-payment' },
-      { label: 'Mark analysis Report', to: '/marks-analysis' },
-      
+      { label: "Payment", to: "/student-payment", icon: DollarSign },
+      { label: "Mark Analysis", to: "/marks-analysis", icon: BarChart2 },
     ];
-  } else if (role === 'teacher') {
+  } else if (role === "teacher") {
     buttons = [
-      { label: 'View Salary', to: '/teacher-salary' },
-      { label: 'Marks', to: '/add-marks' },
-
+      { label: "View Salary", to: "/teacher-salary", icon: DollarSign },
+      { label: "Marks", to: "/add-marks", icon: BookOpen },
     ];
   }
 
   return (
-    <aside className="flex flex-col w-56 min-h-full gap-6 p-6 mt-8 ml-4 shadow-xl bg-white/80 rounded-3xl">
-      <nav className="flex flex-col flex-1 h-full gap-4">
-        {buttons.map((btn, idx) => (
-          <button
-            key={btn.label}
-            onClick={() => navigate(btn.to)}
-            className="flex-1 min-h-0 sidebar-btn wow-btn"
-            style={{ minHeight: 0 }}
-          >
-            {btn.label}
-          </button>
-        ))}
+    <aside className="flex flex-col w-64 h-screen bg-white shadow-lg border-r rounded-r-2xl p-6">
+      {/* Logo / Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-800 tracking-tight">
+          Dashboard
+        </h1>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex flex-col gap-2">
+        {buttons.map((btn) => {
+          const Icon = btn.icon;
+          return (
+            <button
+              key={btn.label}
+              onClick={() => navigate(btn.to)}
+              className="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-xl hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-500 hover:text-white transition-all duration-300 ease-in-out"
+            >
+              <Icon className="w-5 h-5" />
+              <span className="font-medium">{btn.label}</span>
+            </button>
+          );
+        })}
       </nav>
-      <style>{`
-        .sidebar-btn {
-          @apply w-full h-full py-3 px-6 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-extrabold shadow-xl text-lg tracking-wide relative overflow-hidden transition-all duration-300 flex items-center justify-center;
-        }
-        .wow-btn {
-          box-shadow: 0 4px 24px 0 rgba(99,102,241,0.25), 0 1.5px 8px 0 rgba(232,121,249,0.15);
-          border: none;
-          position: relative;
-          z-index: 1;
-        }
-        .wow-btn:before {
-          content: '';
-          position: absolute;
-          left: 0; top: 0; right: 0; bottom: 0;
-          background: linear-gradient(120deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
-          opacity: 0.25;
-          filter: blur(12px);
-          z-index: -1;
-          transition: opacity 0.3s;
-        }
-        .wow-btn:hover {
-          transform: scale(1.08) rotate(-1deg);
-          box-shadow: 0 8px 32px 0 rgba(99,102,241,0.35), 0 3px 16px 0 rgba(232,121,249,0.25);
-        }
-        .wow-btn:hover:before {
-          opacity: 0.5;
-        }
-      `}</style>
+
+      {/* Footer */}
+      <div className="mt-auto pt-6 border-t">
+        <button
+          onClick={() => navigate("/logout")}
+          className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition"
+        >
+          <Home className="w-5 h-5" />
+          <span className="font-medium">Logout</span>
+        </button>
+      </div>
     </aside>
   );
 }
