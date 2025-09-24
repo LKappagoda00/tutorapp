@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 export default function SalaryTable() {
   const [allPayments, setAllPayments] = useState([]); // Store all payments
@@ -132,6 +133,33 @@ export default function SalaryTable() {
     navigate(`/update-salary/${paymentId}`);
   };
 
+  const handleDownloadExcel = () => {
+    // Prepare data for Excel
+    const data = filteredPayments.map(payment => ({
+      Student: payment.student?.fullName || payment.student?.userName || '-',
+      Teacher: payment.teacher?.fullName || payment.teacher?.userName || '-',
+      Subject: payment.teacher?.subject || '-',
+      Amount: payment.amount,
+      TeacherShare: payment.teacherAmount || '0',
+      AdminShare: payment.adminAmount || '0',
+      PaymentDate: payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString() : '-',
+      Status: payment.status || 'pending',
+      Note: payment.note || '-'
+    }));
+    
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Salary Report');
+    
+    // Generate filename with current date and filters
+    const today = new Date().toISOString().split('T')[0];
+    const monthFilter = selectedMonth ? months.find(m => m.value == selectedMonth)?.label : 'All';
+    const yearFilter = selectedYear || 'All';
+    const filename = `salary_report_${monthFilter}_${yearFilter}_${today}.xlsx`;
+    
+    XLSX.writeFile(workbook, filename);
+  };
+
   // Generate month options
   const months = [
     { value: '', label: 'All Months' },
@@ -163,7 +191,7 @@ export default function SalaryTable() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8">
+      <div className="flex items-center justify-center py-8">
         <div className="text-lg text-gray-600">Loading salary data...</div>
       </div>
     );
@@ -171,30 +199,30 @@ export default function SalaryTable() {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center py-8">
+      <div className="flex items-center justify-center py-8">
         <div className="text-lg text-red-600">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="min-h-screen p-6 bg-gray-50">
       {/* Header Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+      <div className="p-6 mb-6 bg-white rounded-lg shadow-md">
+        <div className="flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-center">
           <div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Salary Management</h3>
-            <p className="text-gray-600 text-sm">Manage and track payment statuses for all teachers</p>
+            <h3 className="mb-2 text-2xl font-bold text-gray-800">Salary Management</h3>
+            <p className="text-sm text-gray-600">Manage and track payment statuses for all teachers</p>
           </div>
           
           {/* Filter Controls */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Month:</label>
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 {months.map((month) => (
                   <option key={month.value} value={month.value}>
@@ -209,7 +237,7 @@ export default function SalaryTable() {
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 {years.map((year) => (
                   <option key={year.value} value={year.value}>
@@ -221,16 +249,24 @@ export default function SalaryTable() {
             
             <button
               onClick={clearFilters}
-              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors text-sm font-medium whitespace-nowrap"
+              className="px-4 py-2 text-sm font-medium text-white transition-colors bg-gray-500 rounded-md hover:bg-gray-600 whitespace-nowrap"
             >
               Clear Filters
+            </button>
+            
+            <button
+              onClick={handleDownloadExcel}
+              disabled={filteredPayments.length === 0}
+              className="px-4 py-2 text-sm font-medium text-white transition-colors bg-green-500 rounded-md hover:bg-green-600 whitespace-nowrap disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              Download Report
             </button>
           </div>
         </div>
         
         {/* Statistics Row */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="pt-4 mt-4 border-t border-gray-200">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{filteredPayments.length}</div>
               <div className="text-xs text-gray-600">Showing</div>
@@ -256,8 +292,8 @@ export default function SalaryTable() {
       </div>
 
       {/* Status Legend */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-        <h4 className="text-sm font-semibold text-gray-700 mb-3">Status Legend:</h4>
+      <div className="p-4 mb-6 bg-white rounded-lg shadow-md">
+        <h4 className="mb-3 text-sm font-semibold text-gray-700">Status Legend:</h4>
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-yellow-400 rounded"></div>
@@ -276,19 +312,19 @@ export default function SalaryTable() {
 
       {/* Main Table Section */}
       {loading ? (
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <div className="flex justify-center items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="p-8 bg-white rounded-lg shadow-md">
+          <div className="flex items-center justify-center">
+            <div className="w-12 h-12 border-b-2 border-purple-600 rounded-full animate-spin"></div>
             <span className="ml-3 text-gray-600">Loading payments...</span>
           </div>
         </div>
       ) : filteredPayments.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+        <div className="p-8 text-center bg-white rounded-lg shadow-md">
           <div className="text-gray-500">
-            <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No payments found</h3>
+            <h3 className="mb-2 text-lg font-medium text-gray-900">No payments found</h3>
             <p className="text-gray-500">
               {selectedMonth !== 'all' || selectedYear !== 'all' ? 
                 'No payment records found for the selected filters. Try adjusting your search criteria.' : 
@@ -298,7 +334,7 @@ export default function SalaryTable() {
             {(selectedMonth !== 'all' || selectedYear !== 'all') && (
               <button
                 onClick={clearFilters}
-                className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm"
+                className="px-4 py-2 mt-4 text-sm text-white transition-colors bg-purple-600 rounded-md hover:bg-purple-700"
               >
                 View All Payments
               </button>
@@ -306,22 +342,22 @@ export default function SalaryTable() {
           </div>
         </div>
       ) : (
-        <div className="overflow-x-auto shadow-lg rounded-lg">
+        <div className="overflow-x-auto rounded-lg shadow-lg">
           <table className="w-full bg-white border-collapse">
             <thead>
-              <tr className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-                <th className="py-4 px-3 text-left font-semibold" style={{width: "4%"}}>No</th>
-                <th className="py-4 px-3 text-left font-semibold" style={{width: "12%"}}>Teacher</th>
-                <th className="py-4 px-3 text-left font-semibold" style={{width: "12%"}}>Student</th>
-                <th className="py-4 px-3 text-left font-semibold" style={{width: "8%"}}>Class ID</th>
-                <th className="py-4 px-3 text-left font-semibold" style={{width: "10%"}}>Subject</th>
-                <th className="py-4 px-3 text-right font-semibold" style={{width: "10%"}}>Amount</th>
-                <th className="py-4 px-3 text-right font-semibold" style={{width: "8%"}}>Admin (15%)</th>
-                <th className="py-4 px-3 text-right font-semibold" style={{width: "8%"}}>Teacher Pay</th>
-                <th className="py-4 px-3 text-center font-semibold" style={{width: "10%"}}>Status</th>
-                <th className="py-4 px-3 text-center font-semibold" style={{width: "8%"}}>Date</th>
-                <th className="py-4 px-3 text-left font-semibold" style={{width: "12%"}}>Bank Details</th>
-                <th className="py-4 px-3 text-center font-semibold" style={{width: "8%"}}>Actions</th>
+              <tr className="text-white bg-gradient-to-r from-purple-600 to-blue-600">
+                <th className="px-3 py-4 font-semibold text-left" style={{width: "4%"}}>No</th>
+                <th className="px-3 py-4 font-semibold text-left" style={{width: "12%"}}>Teacher</th>
+                <th className="px-3 py-4 font-semibold text-left" style={{width: "12%"}}>Student</th>
+                <th className="px-3 py-4 font-semibold text-left" style={{width: "8%"}}>Class ID</th>
+                <th className="px-3 py-4 font-semibold text-left" style={{width: "10%"}}>Subject</th>
+                <th className="px-3 py-4 font-semibold text-right" style={{width: "10%"}}>Amount</th>
+                <th className="px-3 py-4 font-semibold text-right" style={{width: "8%"}}>Admin (15%)</th>
+                <th className="px-3 py-4 font-semibold text-right" style={{width: "8%"}}>Teacher Pay</th>
+                <th className="px-3 py-4 font-semibold text-center" style={{width: "10%"}}>Status</th>
+                <th className="px-3 py-4 font-semibold text-center" style={{width: "8%"}}>Date</th>
+                <th className="px-3 py-4 font-semibold text-left" style={{width: "12%"}}>Bank Details</th>
+                <th className="px-3 py-4 font-semibold text-center" style={{width: "8%"}}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -332,13 +368,13 @@ export default function SalaryTable() {
                   'border-l-4 border-yellow-500'
                 }`}>
                   {/* Row Number */}
-                  <td className="py-4 px-3 font-bold text-gray-700" style={{width: "4%"}}>
+                  <td className="px-3 py-4 font-bold text-gray-700" style={{width: "4%"}}>
                     {idx + 1}
                   </td>
                   
                   {/* Teacher */}
-                  <td className="py-4 px-3" style={{width: "12%"}}>
-                    <div className="font-semibold text-blue-700 text-sm truncate" title={payment.teacher?.fullName || 'N/A'}>
+                  <td className="px-3 py-4" style={{width: "12%"}}>
+                    <div className="text-sm font-semibold text-blue-700 truncate" title={payment.teacher?.fullName || 'N/A'}>
                       {payment.teacher?.fullName || 'N/A'}
                     </div>
                     <div className="text-xs text-gray-600 truncate" title={payment.teacher?.subject || 'N/A'}>
@@ -347,49 +383,49 @@ export default function SalaryTable() {
                   </td>
 
                   {/* Student */}
-                  <td className="py-4 px-3" style={{width: "12%"}}>
-                    <div className="font-medium text-sm truncate" title={payment.student?.fullName || 'N/A'}>
+                  <td className="px-3 py-4" style={{width: "12%"}}>
+                    <div className="text-sm font-medium truncate" title={payment.student?.fullName || 'N/A'}>
                       {payment.student?.fullName || 'N/A'}
                     </div>
                   </td>
 
                   {/* Class ID */}
-                  <td className="py-4 px-3" style={{width: "8%"}}>
-                    <div className="font-mono text-xs bg-gray-100 px-2 py-1 rounded truncate" title={payment.classId}>
+                  <td className="px-3 py-4" style={{width: "8%"}}>
+                    <div className="px-2 py-1 font-mono text-xs truncate bg-gray-100 rounded" title={payment.classId}>
                       {payment.classId}
                     </div>
                   </td>
 
                   {/* Subject */}
-                  <td className="py-4 px-3" style={{width: "10%"}}>
+                  <td className="px-3 py-4" style={{width: "10%"}}>
                     <div className="text-sm truncate" title={payment.subject}>
                       {payment.subject}
                     </div>
                   </td>
 
                   {/* Amount */}
-                  <td className="py-4 px-3 text-right" style={{width: "10%"}}>
-                    <div className="font-bold text-green-600 text-sm">
+                  <td className="px-3 py-4 text-right" style={{width: "10%"}}>
+                    <div className="text-sm font-bold text-green-600">
                       Rs. {payment.amount.toLocaleString()}
                     </div>
                   </td>
 
                   {/* Admin Commission */}
-                  <td className="py-4 px-3 text-right" style={{width: "8%"}}>
-                    <div className="font-medium text-purple-600 text-sm">
+                  <td className="px-3 py-4 text-right" style={{width: "8%"}}>
+                    <div className="text-sm font-medium text-purple-600">
                       Rs. {(payment.adminCommission || 0).toLocaleString()}
                     </div>
                   </td>
 
                   {/* Teacher Payment */}
-                  <td className="py-4 px-3 text-right" style={{width: "8%"}}>
-                    <div className="font-medium text-blue-600 text-sm">
+                  <td className="px-3 py-4 text-right" style={{width: "8%"}}>
+                    <div className="text-sm font-medium text-blue-600">
                       Rs. {(payment.teacherPayment || 0).toLocaleString()}
                     </div>
                   </td>
 
                   {/* Status */}
-                  <td className="py-4 px-3 text-center" style={{width: "10%"}}>
+                  <td className="px-3 py-4 text-center" style={{width: "10%"}}>
                     <select
                       value={payment.status}
                       onChange={(e) => updatePaymentStatus(payment._id, e.target.value)}
@@ -407,15 +443,15 @@ export default function SalaryTable() {
                   </td>
 
                   {/* Date */}
-                  <td className="py-4 px-3 text-center" style={{width: "8%"}}>
+                  <td className="px-3 py-4 text-center" style={{width: "8%"}}>
                     <div className="text-xs text-gray-600">
                       {new Date(payment.paymentDate).toLocaleDateString('en-GB')}
                     </div>
                   </td>
 
                   {/* Bank Details */}
-                  <td className="py-4 px-3" style={{width: "12%"}}>
-                    <div className="text-xs text-gray-700 space-y-1">
+                  <td className="px-3 py-4" style={{width: "12%"}}>
+                    <div className="space-y-1 text-xs text-gray-700">
                       <div className="truncate" title={payment.teacher?.bankName || 'N/A'}>
                         <span className="font-semibold">Bank:</span> {payment.teacher?.bankName || 'N/A'}
                       </div>
@@ -429,13 +465,13 @@ export default function SalaryTable() {
                   </td>
 
                   {/* Actions */}
-                  <td className="py-4 px-3 text-center" style={{width: "8%"}}>
+                  <td className="px-3 py-4 text-center" style={{width: "8%"}}>
                     <button
                       onClick={() => handleUpdatePayment(payment._id)}
-                      className="group relative bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-3 py-2 rounded-md text-xs font-medium transition-all duration-200 transform hover:scale-105 shadow-md hover:shadow-lg"
+                      className="relative px-3 py-2 text-xs font-medium text-white transition-all duration-200 transform rounded-md shadow-md group bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 hover:scale-105 hover:shadow-lg"
                       title="Update payment details"
                     >
-                      <svg className="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       Update

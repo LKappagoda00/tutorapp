@@ -70,7 +70,7 @@ export default function AddMarks() {
           examType: form.examType,
           lesson: form.subject,
           marks: form.marks,
-          note: form.note,
+          specialNote: form.note,
           teacher: teacherId
         })
       });

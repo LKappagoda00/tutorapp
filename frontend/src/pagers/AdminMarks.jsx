@@ -16,7 +16,7 @@ export default function AdminMarks() {
       ExamType: mark.examType,
       Lesson: mark.lesson,
       Marks: mark.marks,
-      SpecialNote: mark.specialNote || mark.note || '-'
+      SpecialNote: mark.specialNote || 'No note'
     }));
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -37,6 +37,10 @@ export default function AdminMarks() {
     fetch('http://localhost:5000/api/marks')
       .then(res => res.json())
       .then(data => {
+        console.log('Fetched marks data:', data); // Debug: Check the actual data structure
+        if (data.length > 0) {
+          console.log('First mark object:', data[0]); // Debug: Check field names
+        }
         setMarks(data);
         setLoading(false);
       })
@@ -110,7 +114,7 @@ export default function AdminMarks() {
                         <td className="py-2">{mark.examType}</td>
                         <td className="py-2">{mark.lesson}</td>
                         <td className="py-2">{mark.marks}</td>
-                        <td className="py-2">{mark.specialNote || mark.note || '-'}</td>
+                        <td className="py-2">{mark.specialNote || 'No note'}</td>
                         <td className="flex justify-center gap-2 py-2">
                           <button
                             className="px-3 py-1 font-semibold text-white transition-all rounded-lg shadow bg-gradient-to-r from-blue-500 to-purple-500 hover:scale-105"

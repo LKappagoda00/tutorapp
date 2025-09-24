@@ -9,7 +9,7 @@ export default function Sidebar({ role }) {
   if (role === 'admin') {
     buttons = [
       { label: 'Salary', to: '/admin-salary' },
-      { label: 'Marks', to: '/admin-marks' },
+      // { label: 'Marks', to: '/admin-marks' },
       { label: 'Users', to: '/admin-users' },
     ];
   } else if (role === 'student') {
