@@ -34,6 +34,14 @@ app.use('/api/users', userRoutes);
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
+// Booking routes
+const bookingRoutes = require('./routes/BookingRoute');
+app.use('/api/bookings', bookingRoutes);
+const resourceRoutes = require('./routes/resourceRoutes');
+app.use('/api/resources', resourceRoutes);
+
+const chatbotRoutes = require('./routes/chatbotRoutes');
+app.use('/api/chatbot', chatbotRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
