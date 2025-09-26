@@ -17,7 +17,7 @@ export default function Sidebar({ role }) {
     buttons = [
       { label: "Salary", to: "/admin-salary", icon: DollarSign },
       { label: "Users", to: "/admin-users", icon: Users },
-      { lable: "library", to: "/library-admin", icon: Library }
+      { lable: "library", to: "/library-admin", icon: Library },
        {label: "Session", to: "/sessions", icon: Users},
     ];
   } else if (role === "student") {
