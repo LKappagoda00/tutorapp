@@ -388,7 +388,6 @@
 //------------------------------------------------------------------
 
 import { useEffect, useState } from "react";
-import "./dashboard.css";
 import Navbar from "./Navbar.jsx";
 import Chatbot from "./Chatbot.jsx";
 
@@ -620,89 +619,104 @@ const AdminDashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="admin-container">\n        <div className="admin-wrapper">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 py-8 px-4">
+        <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="admin-header">
-          <div className="header-content">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-10 border border-white/90">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div>
-              <h1 className="header-title">Admin Dashboard</h1>
-              <p className="header-subtitle">Manage your library resources</p>
+              <h1 className="text-4xl font-bold text-slate-800 mb-2">Admin Dashboard</h1>
+              <p className="text-slate-600 text-lg">Manage your library resources</p>
             </div>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <button onClick={handleExport} className="header-button">
+            <div className="flex gap-3 flex-wrap">
+              <button 
+                onClick={handleExport} 
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
                 📊 Export PDF
               </button>
-              <button onClick={testConnection} className="header-button" style={{ background: '#10b981' }}>
+              <button 
+                onClick={testConnection} 
+                className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
                 🧪 Test Connection
               </button>
             </div>
           </div>
           
-          <div className="stats-container">
-            <div className="stats-flex">
-              <div className="stat-box">
-                <div className="stat-number">{resources.length}</div>
-                <div className="stat-label">Total Resources</div>
+          <div className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200/50">
+                <div className="text-3xl font-bold text-blue-700 mb-2">{resources.length}</div>
+                <div className="text-blue-600 font-medium">Total Resources</div>
               </div>
-              <div className="stat-box">
-                <div className="stat-number">
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200/50">
+                <div className="text-3xl font-bold text-green-700 mb-2">
                   {resources.reduce((sum, r) => sum + (r.views || 0), 0)}
                 </div>
-                <div className="stat-label">Total Views</div>
+                <div className="text-green-600 font-medium">Total Views</div>
+              </div>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200/50">
+                <div className="text-3xl font-bold text-purple-700 mb-2">
+                  {new Set(resources.map(r => r.tag)).size}
+                </div>
+                <div className="text-purple-600 font-medium">Unique Tags</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Resources Grid */}
-        <div className="resources-grid">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
           {resources.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">📚</div>
-              <h3 className="empty-title">No resources yet</h3>
-              <p className="empty-text">Start by uploading some resources to your library</p>
+            <div className="col-span-full flex flex-col items-center py-20 text-center">
+              <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl p-12 mb-6 shadow-xl">
+                <div className="text-6xl mb-4">📚</div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-3">No resources yet</h3>
+                <p className="text-slate-600 text-lg">Start by uploading some resources to your library</p>
+              </div>
             </div>
           ) : (
             resources.map((r) => (
-              <div key={r._id} className="resource-card">
+              <div key={r._id} className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/90 transition-all duration-500 hover:shadow-3xl hover:scale-105 hover:bg-white/95 overflow-hidden">
                 {editingResource === r._id ? (
                   // Edit Form
-                  <div className="edit-form">
-                    <h3 className="edit-title">Edit Resource</h3>
-                    <div className="form-grid">
-                      <div className="form-group">
-                        <label className="form-label">Title *</label>
+                  <div className="p-8">
+                    <h3 className="text-2xl font-bold text-slate-800 mb-6">Edit Resource</h3>
+                    <div className="space-y-6">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Title *</label>
                         <input
                           type="text"
                           name="title"
                           value={editForm.title}
                           onChange={handleInputChange}
-                          className="form-input"
+                          className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
                           placeholder="Enter title"
                           required
                         />
                       </div>
                       
-                      <div className="form-group">
-                        <label className="form-label">Description</label>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
                         <textarea
                           name="description"
                           value={editForm.description}
                           onChange={handleInputChange}
-                          className="form-input form-textarea"
+                          className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 resize-vertical"
                           placeholder="Enter description"
                           rows="2"
                         />
                       </div>
 
-                      <div className="form-grid-cols">
-                        <div className="form-group">
-                          <label className="form-label">Type *</label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Type *</label>
                           <select
                             name="type"
                             value={editForm.type}
                             onChange={handleInputChange}
-                            className="form-input"
+                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
                             required
                           >
                             <option value="">Select Type</option>
@@ -712,14 +726,14 @@ const AdminDashboard = () => {
                           </select>
                         </div>
                         
-                        <div className="form-group">
-                          <label className="form-label">Tag *</label>
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Tag *</label>
                           <input
                             type="text"
                             name="tag"
                             value={editForm.tag}
                             onChange={handleInputChange}
-                            className="form-input"
+                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
                             placeholder="Enter tag"
                             required
                           />
@@ -727,44 +741,44 @@ const AdminDashboard = () => {
                       </div>
 
                       {editForm.type === "video" && (
-                        <div className="form-group">
-                          <label className="form-label">Drive Link</label>
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Drive Link</label>
                           <input
                             type="url"
                             name="driveLink"
                             value={editForm.driveLink}
                             onChange={handleInputChange}
-                            className="form-input"
+                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
                             placeholder="Enter Google Drive link"
                           />
                         </div>
                       )}
 
                       {/* {editForm.type === "virtual_book" && (
-                        <div className="form-group">
-                          <label className="form-label">Content</label>
+                        <div>
+                          <label className="block text-sm font-bold text-slate-700 mb-2">Content</label>
                           <textarea
                             name="content"
                             value={editForm.content}
                             onChange={handleInputChange}
-                            className="form-input form-textarea"
+                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 resize-vertical"
                             placeholder="Enter book content"
                             rows="4"
                           />
                         </div>
                       )} */}
 
-                      <div className="form-actions">
+                      <div className="flex gap-4 pt-6 border-t border-slate-200">
                         <button 
                           onClick={() => handleUpdate(r._id)}
-                          className="btn btn-success"
+                          className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={updateLoading}
                         >
                           {updateLoading ? "⏳ Updating..." : "💾 Save Changes"}
                         </button>
                         <button 
                           onClick={handleCancelEdit}
-                          className="btn btn-secondary"
+                          className="flex-1 px-6 py-3 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={updateLoading}
                         >
                           ❌ Cancel
@@ -774,43 +788,61 @@ const AdminDashboard = () => {
                   </div>
                 ) : (
                   // Display Mode
-                  <div className="card-content">
-                    <div className="card-header">
-                      <div className="card-title-section">
-                        <span className="card-icon">{getTypeIcon(r.type)}</span>
-                        <h3 className="card-title">{r.title}</h3>
+                  <div className="p-8">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-3xl">{getTypeIcon(r.type)}</span>
+                        <h3 className="text-xl font-bold text-slate-800">{r.title}</h3>
                       </div>
-                      <span className={`type-badge ${getTypeClass(r.type)}`}>
+                      <span className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wide ${
+                        r.type === 'pdf' 
+                          ? 'bg-red-100 text-red-700 border border-red-200' 
+                          : r.type === 'video' 
+                          ? 'bg-purple-100 text-purple-700 border border-purple-200' 
+                          : r.type === 'virtual_book' 
+                          ? 'bg-green-100 text-green-700 border border-green-200' 
+                          : 'bg-slate-100 text-slate-700 border border-slate-200'
+                      }`}>
                         {r.type}
                       </span>
                     </div>
 
                     {r.description && (
-                      <p className="card-description">{r.description}</p>
+                      <p className="text-slate-600 mb-6 leading-relaxed">{r.description}</p>
                     )}
 
-                    <div className="card-details">
-                      <div className="detail-item">
+                    <div className="flex flex-wrap gap-4 mb-6">
+                      <div className="flex items-center space-x-2 bg-blue-50 rounded-xl px-4 py-2 border border-blue-200">
                         <span>🏷️</span>
-                        <span className="tag">{r.tag}</span>
+                        <span className="font-semibold text-blue-700">{r.tag}</span>
                       </div>
-                      <div className="detail-item">
+                      <div className="flex items-center space-x-2 bg-green-50 rounded-xl px-4 py-2 border border-green-200">
                         <span>👁️</span>
-                        <span className="views">{r.views} views</span>
+                        <span className="font-semibold text-green-700">{r.views} views</span>
                       </div>
                     </div>
 
                     {(r.driveLink || r.fileUrl) && (
-                      <div className="links-section">
-                        <div className="links-title">Links:</div>
-                        <div className="space-y-1">
+                      <div className="mb-6">
+                        <div className="text-sm font-bold text-slate-700 mb-3">Links:</div>
+                        <div className="space-y-2">
                           {r.driveLink && (
-                            <a href={r.driveLink} target="_blank" rel="noopener noreferrer" className="link">
+                            <a 
+                              href={r.driveLink} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="block px-4 py-3 bg-gradient-to-r from-purple-100 to-purple-200 hover:from-purple-200 hover:to-purple-300 text-purple-700 font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border border-purple-200"
+                            >
                               🔗 Google Drive Link
                             </a>
                           )}
                           {r.fileUrl && (
-                            <a href={`http://localhost:5000${r.fileUrl}`} target="_blank" rel="noopener noreferrer" className="link">
+                            <a 
+                              href={`http://localhost:5000${r.fileUrl}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="block px-4 py-3 bg-gradient-to-r from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 text-red-700 font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border border-red-200"
+                            >
                               📄 View PDF File
                             </a>
                           )}
@@ -818,17 +850,17 @@ const AdminDashboard = () => {
                       </div>
                     )}
 
-                    <div className="card-actions">
+                    <div className="flex gap-3 pt-6 border-t border-slate-200">
                       <button 
                         onClick={() => handleEdit(r)}
-                        className="btn btn-primary"
+                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                       >
                         <span>✏️</span>
                         <span>Edit</span>
                       </button>
                       <button 
                         onClick={() => handleDelete(r._id)}
-                        className="btn btn-danger"
+                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                       >
                         <span>🗑️</span>
                         <span>Delete</span>

@@ -6,6 +6,7 @@ import {
   Users,
   BookOpen,
   BarChart2,
+  Library,
 } from "lucide-react";
 
 export default function Sidebar({ role }) {
@@ -16,6 +17,7 @@ export default function Sidebar({ role }) {
     buttons = [
       { label: "Salary", to: "/admin-salary", icon: DollarSign },
       { label: "Users", to: "/admin-users", icon: Users },
+      { lable: "library", to: "/library-admin", icon: Library }
     ];
   } else if (role === "student") {
     buttons = [
