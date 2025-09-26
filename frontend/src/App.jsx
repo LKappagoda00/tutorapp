@@ -32,6 +32,13 @@ import LibraryChatbot from "./pagers/library/Chatbot.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import SessionDetails from "./ScheduleComponents/SessionDetails/SessionDetails.jsx"; 
+import DisplaySession from "./ScheduleComponents/SessionDisplay/SessionDisplay.jsx";
+import AddSession from "./ScheduleComponents/AddSession/AddSession.jsx";
+import UpdateSession from './ScheduleComponents/UpdateSession/UpdateSession.jsx';
+import InstructorsPage from './ScheduleComponents/AddSession/InstructorsPage.jsx';
+
+
 export default function App() {
   return (
     <Router>
@@ -60,6 +67,11 @@ export default function App() {
         <Route path="/library-admin" element={<LibraryAdmin />} />
         <Route path="/upload-resource" element={<UploadResource />} />
         <Route path="/library-chat" element={<LibraryChatbot />} />
+        <Route path="/sessions" element={<SessionDetails />} />
+        <Route path="/session/:id" element={<DisplaySession />} /> 
+        <Route path="/add-session" element={<AddSession />} />
+        <Route path="/update-session/:id" element={<UpdateSession />} />
+        <Route path="/instructors" element={<InstructorsPage />} />
       </Routes>
       <ToastContainer position="top-right" />
     </Router>

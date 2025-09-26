@@ -18,6 +18,7 @@ export default function Sidebar({ role }) {
       { label: "Salary", to: "/admin-salary", icon: DollarSign },
       { label: "Users", to: "/admin-users", icon: Users },
       { lable: "library", to: "/library-admin", icon: Library }
+       {label: "Session", to: "/sessions", icon: Users},
     ];
   } else if (role === "student") {
     buttons = [
@@ -25,6 +26,8 @@ export default function Sidebar({ role }) {
       { label: "Mark Analysis", to: "/marks-analysis", icon: BarChart2 },
         { label: "profile", to: "/student-profile", icon: BookOpen },
       { label: "Payment", to: "/student-payment", icon: DollarSign },
+      { label: "Add Session", to: "/add-session", icon: Users},
+      { label: "Book Session", to: "/instructors", icon: Users},
       
     ];
   } else if (role === "teacher") {
