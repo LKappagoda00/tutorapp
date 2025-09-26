@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Navbar from "./Navbar.jsx";
 import Chatbot from "./Chatbot.jsx";
+import Sidebar from "../../components/Sidebar.jsx";
 
 const UploadResource = () => {
   const [form, setForm] = useState({
@@ -162,7 +163,7 @@ const UploadResource = () => {
 
   return (
     <>
-      <Navbar />
+    
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8">
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}

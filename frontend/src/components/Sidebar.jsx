@@ -35,14 +35,16 @@ export default function Sidebar({ role }) {
       { label: "Mark Analysis", to: "/marks-analysis", icon: BarChart2, gradient: "from-cyan-500 to-teal-600" },
       { label: "Profile", to: "/student-profile", icon: UserCircle, gradient: "from-purple-500 to-violet-600" },
       { label: "Payments", to: "/student-payment", icon: DollarSign, gradient: "from-green-500 to-emerald-600" },
-      { label: "Add Session", to: "/add-session", icon: BookOpen, gradient: "from-orange-500 to-amber-600" },
       { label: "Book Session", to: "/instructors", icon: Users, gradient: "from-pink-500 to-rose-600" },
+      { label: "Library", to: "/library", icon: Library, gradient: "from-orange-500 to-amber-600" },
     ];
   } else if (role === "teacher") {
     buttons = [
       { label: "Dashboard", to: "/teacher-dashboard", icon: Home, gradient: "from-blue-500 to-indigo-600" },
       { label: "Salary Overview", to: "/teacher-salary", icon: DollarSign, gradient: "from-green-500 to-emerald-600" },
       { label: "Manage Marks", to: "/add-marks", icon: BookOpen, gradient: "from-purple-500 to-violet-600" },
+      { label: "Library", to: "/upload-resource", icon: Library, gradient: "from-orange-500 to-amber-600" },
+
     ];
   }
 

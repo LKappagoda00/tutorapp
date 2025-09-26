@@ -98,12 +98,12 @@ const Library = () => {
     // Open PDF modal for viewing
     setViewingPDF(resource);
     setShowPDFModal(true);
-    
+
     // Also trigger download (without opening new tab)
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = `http://localhost:5000${resource.fileUrl}`;
     link.download = `${resource.title}.pdf`;
-    link.style.display = 'none';
+    link.style.display = "none";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -116,7 +116,6 @@ const Library = () => {
 
   return (
     <>
-      <Navbar />
       <div
         className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 py-8 px-4"
         style={{
