@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import "./libraryDashboard.css";
 import Navbar from "./Navbar.jsx";
+import Chatbot from "./Chatbot.jsx";
 
 const Library = () => {
   const [resources, setResources] = useState([]);
@@ -257,6 +258,7 @@ const Library = () => {
         </div>
         </div>
       </div>
+      <Chatbot />
     </>
   );
 };

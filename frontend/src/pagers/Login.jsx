@@ -22,6 +22,8 @@ export default function Login() {
         navigate("/student-marks");
       } else if (userRole === "teacher") {
         navigate("/teacher-dashboard");
+      } else if (userRole === "library") {
+        navigate("/library");
       }
     } else {
       clearAuthData(); // Clear any invalid data
@@ -89,9 +91,12 @@ export default function Login() {
           navigate("/student-marks");
         } else if (userRole === "teacher") {
           navigate("/teacher-dashboard");
+        } else if (userRole === "library") {
+          navigate("/library");
         } else {
           navigate("/"); // fallback
         }
+
       } else {
         // Backend returns { error } for failed authentication
         setError(data.error || "Invalid username or password");

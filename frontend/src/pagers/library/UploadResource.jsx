@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import Navbar from "./Navbar.jsx";
+import Chatbot from "./Chatbot.jsx";
 
 const UploadResource = () => {
   const [form, setForm] = useState({
@@ -30,9 +31,9 @@ const UploadResource = () => {
       newErrors.driveLink = "Drive link is required";
     }
     
-    // if (form.type === "virtual_book" && !form.content.trim()) {
-    //   newErrors.content = "Content is required";
-    // }
+    if (form.type === "virtual_book" && !form.content.trim()) {
+      newErrors.content = "Content is required";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -55,16 +56,16 @@ const UploadResource = () => {
       data.append("tag", form.tag);
 
       if (form.type === "pdf" && file) {
-        data.append("pdf", file);
+        data.append("file", file);  // Changed from "pdf" to "file" to match backend
       }
       
       if (form.type === "video" && form.driveLink) {
         data.append("driveLink", form.driveLink);
       }
       
-      // if (form.type === "virtual_book" && form.content) {
-      //   data.append("content", form.content);
-      // }
+      if (form.type === "virtual_book" && form.content) {
+        data.append("content", form.content);
+      }
 
       const response = await fetch("http://localhost:5000/api/resources", {
         method: 'POST',
@@ -345,6 +346,7 @@ const UploadResource = () => {
         </div>
       </div>
       </div>
+      <Chatbot />
     </>
   );
 };

@@ -390,6 +390,7 @@
 import { useEffect, useState } from "react";
 import "./dashboard.css";
 import Navbar from "./Navbar.jsx";
+import Chatbot from "./Chatbot.jsx";
 
 const AdminDashboard = () => {
   const [resources, setResources] = useState([]);
@@ -841,6 +842,7 @@ const AdminDashboard = () => {
         </div>
       </div>
       </div>
+      <Chatbot />
     </>
   );
 };

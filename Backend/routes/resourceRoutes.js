@@ -12,7 +12,7 @@ const upload = require('../utils/upload');
 const router = express.Router();
 
 // Resource management routes
-router.post('/add', upload.single('file'), addResource);
+router.post('/', upload.single('file'), addResource);  // Changed from '/add' to '/'
 router.get('/', getResources);
 router.get('/export/pdf', exportReport);
 router.get('/:id', viewResource);

@@ -25,6 +25,10 @@ import Home from "./pagers/Home.jsx";
 import StudentMarks from "./pagers/student/StudentMarks.jsx";
 import MarksAnalysis from "./pagers/student/MarksAnalysis.jsx";
 import StudentProfile from "./pagers/student/studentprofile.jsx";
+import Library from "./pagers/library/libraryDashboad.jsx";
+import LibraryAdmin from "./pagers/library/AdminDashboard.jsx";
+import UploadResource from "./pagers/library/UploadResource.jsx";
+import LibraryChatbot from "./pagers/library/Chatbot.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -52,6 +56,10 @@ export default function App() {
         <Route path="/student-marks" element={<StudentMarks />} />
         <Route path="/marks-analysis" element={<MarksAnalysis />} />
         <Route path="/student-profile" element={<StudentProfile />} />
+        <Route path="/library" element={<Library />} />
+        <Route path="/library-admin" element={<LibraryAdmin />} />
+        <Route path="/upload-resource" element={<UploadResource />} />
+        <Route path="/library-chat" element={<LibraryChatbot />} />
       </Routes>
       <ToastContainer position="top-right" />
     </Router>
