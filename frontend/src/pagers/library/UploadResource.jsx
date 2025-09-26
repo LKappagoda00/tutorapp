@@ -75,8 +75,10 @@ const UploadResource = () => {
         body: data
       });
       
+      const responseData = await response.json();
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
       }
       
       // Success state
@@ -92,11 +94,11 @@ const UploadResource = () => {
       setFile(null);
       setErrors({});
       
-      alert("🎉 Resource uploaded successfully!");
+      alert(`🎉 Resource "${responseData.resource.title}" uploaded successfully!`);
       
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed: ' + (error.response?.data?.message || error.message));
+      alert(`❌ Upload failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -120,7 +122,26 @@ const UploadResource = () => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    setFile(selectedFile);
+    
+    if (selectedFile) {
+      // Check file type
+      if (selectedFile.type !== 'application/pdf') {
+        setErrors(prev => ({ ...prev, file: 'Please select a PDF file only' }));
+        e.target.value = ''; // Clear the input
+        return;
+      }
+      
+      // Check file size (10MB limit)
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, file: 'File size must be less than 10MB' }));
+        e.target.value = ''; // Clear the input
+        return;
+      }
+      
+      setFile(selectedFile);
+    } else {
+      setFile(null);
+    }
     
     if (errors.file) {
       setErrors(prev => ({
@@ -250,7 +271,9 @@ const UploadResource = () => {
                     Upload PDF File *
                   </label>
                   <div className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
-                    errors.file ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-royalBlue'
+                    errors.file ? 'border-red-500 bg-red-50' : 
+                    file ? 'border-green-500 bg-green-50' : 
+                    'border-gray-300 hover:border-royalBlue'
                   }`}>
                     <input
                       type="file"
@@ -260,11 +283,19 @@ const UploadResource = () => {
                       id="file-upload"
                     />
                     <label htmlFor="file-upload" className="cursor-pointer">
-                      <div className="text-3xl mb-2">📄</div>
+                      <div className="text-3xl mb-2">
+                        {file ? '✅' : '📄'}
+                      </div>
                       <p className="text-sm text-gray-600 mb-2">
-                        {file ? file.name : "Click to upload PDF or drag and drop"}
+                        {file ? (
+                          <span className="text-green-600 font-medium">
+                            ✓ {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}MB)
+                          </span>
+                        ) : (
+                          "Click to upload PDF or drag and drop"
+                        )}
                       </p>
-                      <p className="text-xs text-gray-500">Maximum file size: 10MB</p>
+                      <p className="text-xs text-gray-500">Maximum file size: 10MB • PDF format only</p>
                     </label>
                   </div>
                   {errors.file && (

@@ -2,8 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 app.use(express.json());
@@ -39,6 +40,9 @@ const bookingRoutes = require('./routes/BookingRoute');
 app.use('/api/bookings', bookingRoutes);
 const resourceRoutes = require('./routes/resourceRoutes');
 app.use('/api/resources', resourceRoutes);
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const chatbotRoutes = require('./routes/chatbotRoutes');
 app.use('/api/chatbot', chatbotRoutes);

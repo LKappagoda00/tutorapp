@@ -216,6 +216,12 @@ exports.viewResource = async (req, res) => {
       action: 'view', // Action type
     });
 
+    // Set headers for PDF files to enable viewing in browser
+    if (resource.type === 'pdf' && resource.fileUrl) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline');
+    }
+
     res.json(resource);
   } catch (err) {
     res.status(500).json({ message: 'Error viewing resource', error: err.message });
