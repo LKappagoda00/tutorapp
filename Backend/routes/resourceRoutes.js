@@ -5,6 +5,7 @@ const {
     viewResource, 
     deleteResource, 
     exportReport,
+    exportExcelReport,
     updateResource 
 } = require('../controllers/resourceController');
 const upload = require('../utils/upload');
@@ -15,6 +16,7 @@ const router = express.Router();
 router.post('/', upload.single('file'), addResource);  // Changed from '/add' to '/'
 router.get('/', getResources);
 router.get('/export/pdf', exportReport);
+router.get('/export/excel', exportExcelReport);
 router.get('/:id', viewResource);
 router.put('/:id', upload.single('file'), updateResource);
 router.delete('/:id', deleteResource);

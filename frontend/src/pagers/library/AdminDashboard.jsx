@@ -630,10 +630,10 @@ const AdminDashboard = () => {
             </div>
             <div className="flex gap-3 flex-wrap">
               <button 
-                onClick={handleExport} 
+                onClick={() => window.open("http://localhost:5000/api/resources/export/excel", "_blank")}
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
-                📊 Export PDF
+                📊 Export Excel Sheet
               </button>
               <button 
                 onClick={testConnection} 

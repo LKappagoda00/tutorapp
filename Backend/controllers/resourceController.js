@@ -133,7 +133,8 @@
 const mongoose = require('mongoose'); 
 const Resource = require('../models/Resource'); 
 const UsageLog = require('../models/UsageLog'); 
-const exportPDF = require('../utils/exportPDF'); 
+const exportPDF = require('../utils/exportPDF');
+const exportExcel = require('../utils/exportExcel'); 
 
 // ================== ADD RESOURCE ==================
 exports.addResource = async (req, res) => {
@@ -273,5 +274,15 @@ exports.updateResource = async (req, res) => {
   } catch (err) {
     console.error('Update error:', err);
     res.status(500).json({ message: 'Error updating resource', error: err.message });
+  }
+};
+
+// ================== EXPORT EXCEL REPORT ==================
+exports.exportExcelReport = async (req, res) => {
+  try {
+    const resources = await Resource.find(); // Get all resources
+    exportExcel(resources, res); // Generate Excel report
+  } catch (err) {
+    res.status(500).json({ message: 'Error exporting Excel report', error: err.message });
   }
 };
