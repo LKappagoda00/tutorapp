@@ -5,6 +5,8 @@ import Footer from '../components/Footer';
 //import Sidebar from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function AdminMarks() {
   // ...existing code...
@@ -22,6 +24,59 @@ export default function AdminMarks() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Marks');
     XLSX.writeFile(workbook, 'marks_report.xlsx');
+  };
+
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Marks Report', 105, 20, { align: 'center' });
+    
+    // Add date
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 35);
+    
+    // Prepare table data
+    const tableData = marks.map(mark => [
+      mark.student?.fullName || mark.student?.userName || mark.student || '-',
+      mark.examType || '-',
+      mark.lesson || '-',
+      mark.marks || '-',
+      mark.specialNote || 'No note'
+    ]);
+    
+    // Add table using autoTable
+    autoTable(doc, {
+      head: [['Student', 'Exam Type', 'Lesson', 'Marks', 'Special Note']],
+      body: tableData,
+      startY: 45,
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [63, 81, 181],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      },
+      margin: { top: 45, left: 10, right: 10 }
+    });
+    
+    // Add footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
+    }
+    
+    // Save the PDF
+    doc.save('marks_report.pdf');
   };
   const navigate = useNavigate();
   const [marks, setMarks] = React.useState([]);
@@ -86,6 +141,12 @@ export default function AdminMarks() {
                 onClick={handleDownloadExcel}
               >
                 Download Excel
+              </button>
+              <button
+                className="px-5 py-2 font-bold text-white transition-all shadow bg-gradient-to-r from-red-500 to-orange-500 rounded-xl hover:scale-105"
+                onClick={handleDownloadPDF}
+              >
+                Download PDF
               </button>
             </div>
             {loading ? (

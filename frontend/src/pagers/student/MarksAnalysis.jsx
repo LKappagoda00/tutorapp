@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -25,6 +28,8 @@ export default function MarksAnalysis() {
   const [selectedTeacher, setSelectedTeacher] = useState('');
   const [loadingTeachers, setLoadingTeachers] = useState(true);
   const [animateStats, setAnimateStats] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const chartRef = useRef(null);
 
   const handleDownloadExcel = () => {
     const data = marks.map(m => ({
@@ -39,6 +44,148 @@ export default function MarksAnalysis() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'MyMarks');
     XLSX.writeFile(workbook, 'my_marks_report.xlsx');
+  };
+
+  const handleDownloadPDF = async () => {
+    if (marks.length === 0) return;
+    
+    setIsGeneratingPDF(true);
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4');
+      
+      // Get student info
+      const userRaw = localStorage.getItem('user');
+      const user = userRaw ? JSON.parse(userRaw) : {};
+      const studentName = user.fullName || user.userName || 'Student';
+      
+      // Add header
+      doc.setFontSize(20);
+      doc.setTextColor(40, 40, 40);
+      doc.text('Marks Analysis Report', 105, 20, { align: 'center' });
+      
+      // Add student info and date
+      doc.setFontSize(12);
+      doc.text(`Student: ${studentName}`, 20, 35);
+      if (selectedTeacher) {
+        const teacher = teachers.find(t => t._id === selectedTeacher);
+        doc.text(`Teacher: ${teacher?.fullName || 'Unknown'} - ${teacher?.subject || 'N/A'}`, 20, 45);
+      } else {
+        doc.text('Teacher: All Teachers', 20, 45);
+      }
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 55);
+      doc.text(`Total Records: ${marks.length}`, 20, 65);
+      
+      let currentY = 75;
+      
+      // Capture and add chart if available
+      if (chartRef.current) {
+        try {
+          const canvas = await html2canvas(chartRef.current, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            allowTaint: true
+          });
+          
+          const imgWidth = 170;
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          
+          // Add chart to PDF
+          doc.addImage(
+            canvas.toDataURL('image/png'),
+            'PNG',
+            20,
+            currentY,
+            imgWidth,
+            Math.min(imgHeight, 100) // Limit height to 100mm
+          );
+          
+          currentY += Math.min(imgHeight, 100) + 15;
+        } catch (error) {
+          console.warn('Could not capture chart:', error);
+          currentY += 20;
+        }
+      }
+      
+      // Check if we need a new page
+      if (currentY > 250) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      // Add marks table
+      const tableData = marks.map(mark => [
+        mark.teacher?.fullName || 'N/A',
+        mark.teacher?.subject || 'N/A',
+        mark.examType || 'N/A',
+        mark.marks?.toString() || '0',
+        mark.date ? new Date(mark.date).toLocaleDateString() : 'N/A',
+        mark.specialNote || 'No note'
+      ]);
+      
+      autoTable(doc, {
+        head: [['Teacher', 'Subject', 'Exam Type', 'Marks', 'Date', 'Note']],
+        body: tableData,
+        startY: currentY,
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+        },
+        headStyles: {
+          fillColor: [124, 58, 237], // Purple color
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 250]
+        },
+        columnStyles: {
+          0: { cellWidth: 35 }, // Teacher
+          1: { cellWidth: 25 }, // Subject
+          2: { cellWidth: 25 }, // Exam Type
+          3: { cellWidth: 15 }, // Marks
+          4: { cellWidth: 25 }, // Date
+          5: { cellWidth: 45 }  // Note
+        },
+        margin: { left: 20, right: 20 }
+      });
+      
+      // Add statistics
+      const finalY = doc.lastAutoTable.finalY + 15;
+      if (finalY < 250) {
+        doc.setFontSize(12);
+        doc.setTextColor(40, 40, 40);
+        
+        const averageMark = marks.length > 0 ? (marks.reduce((sum, m) => sum + (m.marks || 0), 0) / marks.length).toFixed(1) : 0;
+        const highestMark = marks.length > 0 ? Math.max(...marks.map(m => m.marks || 0)) : 0;
+        const lowestMark = marks.length > 0 ? Math.min(...marks.map(m => m.marks || 0)) : 0;
+        const passedSubjects = marks.filter(m => (m.marks || 0) >= 45).length;
+        
+        doc.text('Performance Summary:', 20, finalY);
+        doc.text(`Average Mark: ${averageMark}`, 20, finalY + 10);
+        doc.text(`Highest Mark: ${highestMark}`, 20, finalY + 20);
+        doc.text(`Lowest Mark: ${lowestMark}`, 20, finalY + 30);
+        doc.text(`Passed Subjects: ${passedSubjects}/${marks.length}`, 20, finalY + 40);
+      }
+      
+      // Add footer
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
+      }
+      
+      // Save PDF
+      const fileName = `marks_analysis_${studentName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   // Get student id from localStorage
@@ -277,13 +424,28 @@ export default function MarksAnalysis() {
                   </select>
                 </div>
                 
-                <div className="flex items-end">
-                  <button
+                <div className="flex items-end gap-4">
+                  {/* <button
                     className="px-6 py-3 font-bold text-white transition-all duration-300 transform shadow-lg sm:px-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl hover:from-purple-600 hover:to-pink-600 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 active:scale-95"
                     onClick={handleDownloadExcel}
                     disabled={marks.length === 0}
                   >
-                    📊 Download Report
+                    📊 Download Excel
+                  </button> */}
+                  
+                  <button
+                    className="px-6 py-3 font-bold text-white transition-all duration-300 transform shadow-lg sm:px-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl hover:from-red-600 hover:to-orange-600 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 active:scale-95"
+                    onClick={handleDownloadPDF}
+                    disabled={marks.length === 0 || isGeneratingPDF}
+                  >
+                    {isGeneratingPDF ? (
+                      <span className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
+                        Generating...
+                      </span>
+                    ) : (
+                      '📄 Download PDF'
+                    )}
                   </button>
                 </div>
               </div>
@@ -306,7 +468,7 @@ export default function MarksAnalysis() {
                 <>
                   {/* Enhanced Bar Chart */}
                   <div className="p-6 mb-12 border border-purple-100 shadow-lg bg-gradient-to-br from-white to-purple-50 rounded-2xl">
-                    <div className="h-64 sm:h-80 lg:h-96">
+                    <div className="h-64 sm:h-80 lg:h-96" ref={chartRef}>
                       <Bar data={chartData} options={chartOptions} />
                     </div>
                   </div>

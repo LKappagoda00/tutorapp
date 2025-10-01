@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function SalaryTable() {
   const [allPayments, setAllPayments] = useState([]); // Store all payments
@@ -160,6 +162,97 @@ export default function SalaryTable() {
     XLSX.writeFile(workbook, filename);
   };
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF('l', 'mm', 'a4'); // landscape orientation for better table fit
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Salary Report', doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+    
+    // Add filters and date info
+    doc.setFontSize(12);
+    const monthFilter = selectedMonth ? months.find(m => m.value == selectedMonth)?.label : 'All Months';
+    const yearFilter = selectedYear || 'All Years';
+    doc.text(`Period: ${monthFilter} ${yearFilter}`, 20, 35);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 45);
+    doc.text(`Total Records: ${filteredPayments.length}`, 20, 55);
+    
+    // Prepare table data
+    const tableData = filteredPayments.map(payment => [
+      payment.student?.fullName || payment.student?.userName || '-',
+      payment.teacher?.fullName || payment.teacher?.userName || '-',
+      payment.teacher?.subject || '-',
+      `$${payment.amount || '0'}`,
+      `$${payment.teacherAmount || '0'}`,
+      `$${payment.adminAmount || '0'}`,
+      payment.paymentDate ? new Date(payment.paymentDate).toLocaleDateString() : '-',
+      payment.status || 'pending',
+      payment.note || '-'
+    ]);
+    
+    // Add table
+    autoTable(doc, {
+      head: [['Student', 'Teacher', 'Subject', 'Amount', 'Teacher Share', 'Admin Share', 'Payment Date', 'Status', 'Note']],
+      body: tableData,
+      startY: 65,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+      },
+      headStyles: {
+        fillColor: [63, 81, 181],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240]
+      },
+      columnStyles: {
+        0: { cellWidth: 25 }, // Student
+        1: { cellWidth: 25 }, // Teacher
+        2: { cellWidth: 20 }, // Subject
+        3: { cellWidth: 18 }, // Amount
+        4: { cellWidth: 18 }, // Teacher Share
+        5: { cellWidth: 18 }, // Admin Share
+        6: { cellWidth: 25 }, // Payment Date
+        7: { cellWidth: 18 }, // Status
+        8: { cellWidth: 30 }  // Note
+      },
+      margin: { top: 65, left: 10, right: 10 }
+    });
+    
+    // Add summary statistics
+    const finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(12);
+    doc.setTextColor(40, 40, 40);
+    
+    const completedPayments = filteredPayments.filter(p => p.status === 'completed');
+    const pendingPayments = filteredPayments.filter(p => p.status === 'pending');
+    const totalAmount = filteredPayments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+    const totalTeacherAmount = filteredPayments.reduce((sum, p) => sum + (parseFloat(p.teacherAmount) || 0), 0);
+    const totalAdminAmount = filteredPayments.reduce((sum, p) => sum + (parseFloat(p.adminAmount) || 0), 0);
+    
+    doc.text('Summary:', 20, finalY);
+    doc.text(`Completed Payments: ${completedPayments.length}`, 20, finalY + 10);
+    doc.text(`Pending Payments: ${pendingPayments.length}`, 20, finalY + 20);
+    doc.text(`Total Amount: $${totalAmount.toFixed(2)}`, 20, finalY + 30);
+    doc.text(`Total Teacher Share: $${totalTeacherAmount.toFixed(2)}`, 20, finalY + 40);
+    doc.text(`Total Admin Share: $${totalAdminAmount.toFixed(2)}`, 20, finalY + 50);
+    
+    // Add footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+    }
+    
+    // Save the PDF
+    const filename = `salary_report_${monthFilter}_${yearFilter}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+  };
+
   // Generate month options
   const months = [
     { value: '', label: 'All Months' },
@@ -259,7 +352,15 @@ export default function SalaryTable() {
               disabled={filteredPayments.length === 0}
               className="px-4 py-2 text-sm font-medium text-white transition-colors bg-green-500 rounded-md hover:bg-green-600 whitespace-nowrap disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              Download Report
+              Download Excel
+            </button>
+            
+            <button
+              onClick={handleDownloadPDF}
+              disabled={filteredPayments.length === 0}
+              className="px-4 py-2 text-sm font-medium text-white transition-colors bg-red-500 rounded-md hover:bg-red-600 whitespace-nowrap disabled:bg-gray-300 disabled:cursor-not-allowed"
+            >
+              Download PDF
             </button>
           </div>
         </div>

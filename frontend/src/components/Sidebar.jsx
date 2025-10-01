@@ -31,12 +31,13 @@ export default function Sidebar({ role }) {
     ];
   } else if (role === "student") {
     buttons = [
-      { label: "Dashboard", to: "/student-dashboard", icon: Home, gradient: "from-blue-500 to-indigo-600" },
-      { label: "Mark Analysis", to: "/marks-analysis", icon: BarChart2, gradient: "from-cyan-500 to-teal-600" },
-      { label: "Profile", to: "/student-profile", icon: UserCircle, gradient: "from-purple-500 to-violet-600" },
-      { label: "Payments", to: "/student-payment", icon: DollarSign, gradient: "from-green-500 to-emerald-600" },
-      { label: "Book Session", to: "/instructors", icon: Users, gradient: "from-pink-500 to-rose-600" },
-      { label: "Library", to: "/library", icon: Library, gradient: "from-orange-500 to-amber-600" },
+    
+      { label: "Mark Analysis", to: "/marks-analysis", icon: BarChart2 },
+      { label: "profile", to: "/student-profile", icon: BookOpen },
+      { label: "Payment", to: "/student-payment", icon: DollarSign },
+    
+      { label: "Book Session", to: "/instructors", icon: Users},
+      
     ];
   } else if (role === "teacher") {
     buttons = [
@@ -84,9 +85,9 @@ export default function Sidebar({ role }) {
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 -left-10 w-32 h-32 bg-white/5 rounded-full blur-2xl animate-bounce"></div>
-        <div className="absolute bottom-20 right-5 w-24 h-24 bg-gradient-to-r from-white/10 to-transparent rounded-full blur-xl animate-ping"></div>
+        <div className="absolute w-40 h-40 rounded-full -top-10 -right-10 bg-white/10 blur-3xl animate-pulse"></div>
+        <div className="absolute w-32 h-32 rounded-full top-1/2 -left-10 bg-white/5 blur-2xl animate-bounce"></div>
+        <div className="absolute w-24 h-24 rounded-full bottom-20 right-5 bg-gradient-to-r from-white/10 to-transparent blur-xl animate-ping"></div>
       </div>
 
       {/* Header Section */}
@@ -98,10 +99,10 @@ export default function Sidebar({ role }) {
                 <Sparkles className="w-4 h-4 text-white animate-pulse" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-white tracking-tight">
+                <h1 className="text-lg font-bold tracking-tight text-white">
                   {roleInfo.title}
                 </h1>
-                <p className="text-white/70 text-xs font-medium">
+                <p className="text-xs font-medium text-white/70">
                   {roleInfo.subtitle}
                 </p>
               </div>
@@ -110,7 +111,7 @@ export default function Sidebar({ role }) {
           
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-300 group border border-white/20"
+            className="p-2 transition-all duration-300 border rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-sm group border-white/20"
           >
             <ChevronRight 
               className={`w-5 h-5 text-white transition-transform duration-300 ${
@@ -125,12 +126,12 @@ export default function Sidebar({ role }) {
           isCollapsed ? 'scale-0 opacity-0 h-0' : 'scale-100 opacity-100'
         }`}>
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-white/20 to-white/10 rounded-lg flex items-center justify-center text-lg shadow-inner">
+            <div className="flex items-center justify-center w-8 h-8 text-lg rounded-lg shadow-inner bg-gradient-to-br from-white/20 to-white/10">
               {roleInfo.avatar}
             </div>
             <div className="flex-1">
-              <p className="text-white font-semibold text-xs">Welcome back!</p>
-              <p className="text-white/60 text-xs capitalize">{role} Dashboard</p>
+              <p className="text-xs font-semibold text-white">Welcome back!</p>
+              <p className="text-xs capitalize text-white/60">{role} Dashboard</p>
             </div>
             <div className="w-2 h-2 bg-green-400 rounded-full shadow-lg animate-pulse"></div>
           </div>
@@ -140,7 +141,7 @@ export default function Sidebar({ role }) {
       {/* Navigation Section */}
       <nav className={`flex-1 overflow-y-auto px-3 pb-3 space-y-1 transition-all duration-300 ${isCollapsed ? 'px-1' : 'px-4'}`}>
         <div className={`transition-all duration-500 ${isCollapsed ? 'opacity-0 scale-0 h-0' : 'opacity-100 scale-100 mb-3'}`}>
-          <h3 className="text-white/60 text-xs font-bold uppercase tracking-wider mb-2 px-2">
+          <h3 className="px-2 mb-2 text-xs font-bold tracking-wider uppercase text-white/60">
             Navigation
           </h3>
         </div>
@@ -188,7 +189,7 @@ export default function Sidebar({ role }) {
                   
                   {/* Active indicator */}
                   {isActive && (
-                    <div className="absolute -right-1 -top-1 w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-lg animate-pulse"></div>
+                    <div className="absolute w-3 h-3 rounded-full shadow-lg -right-1 -top-1 bg-gradient-to-r from-yellow-400 to-orange-500 animate-pulse"></div>
                   )}
                 </div>
 
@@ -219,10 +220,10 @@ export default function Sidebar({ role }) {
 
               {/* Tooltip for collapsed state */}
               {isCollapsed && isHovered && (
-                <div className="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 z-50">
-                  <div className="bg-gray-900/95 backdrop-blur-sm text-white px-4 py-2 rounded-xl shadow-2xl border border-white/20 whitespace-nowrap">
+                <div className="absolute z-50 ml-4 transform -translate-y-1/2 left-full top-1/2">
+                  <div className="px-4 py-2 text-white border shadow-2xl bg-gray-900/95 backdrop-blur-sm rounded-xl border-white/20 whitespace-nowrap">
                     <span className="text-sm font-semibold">{btn.label}</span>
-                    <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-gray-900/95"></div>
+                    <div className="absolute transform -translate-y-1/2 border-4 border-transparent right-full top-1/2 border-r-gray-900/95"></div>
                   </div>
                 </div>
               )}
@@ -247,7 +248,7 @@ export default function Sidebar({ role }) {
             isCollapsed ? 'w-5 h-5' : 'w-5 h-5'
           }`} />
           {!isCollapsed && (
-            <span className="text-white/70 group-hover:text-white font-medium transition-colors duration-300">
+            <span className="font-medium transition-colors duration-300 text-white/70 group-hover:text-white">
               Settings
             </span>
           )}
@@ -270,7 +271,7 @@ export default function Sidebar({ role }) {
             isCollapsed ? 'w-5 h-5' : 'w-5 h-5'
           }`} />
           {!isCollapsed && (
-            <span className="text-red-300 group-hover:text-red-200 font-medium transition-colors duration-300">
+            <span className="font-medium text-red-300 transition-colors duration-300 group-hover:text-red-200">
               Logout
             </span>
           )}
