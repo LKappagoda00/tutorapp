@@ -44,6 +44,26 @@ export default function AddMarks() {
 
   const handleChange = e => {
     const { name, value } = e.target;
+    // Clamp marks field between 0 and 100 while typing
+    if (name === 'marks') {
+      // Allow empty value to let user clear the field
+      if (value === '') {
+        setForm(f => ({ ...f, [name]: value }));
+        return;
+      }
+
+      // Prevent non-numeric characters
+      const numeric = value.replace(/[^0-9]/g, '');
+      let num = parseInt(numeric, 10);
+      if (Number.isNaN(num)) num = '';
+
+      // Clamp between 0 and 100
+      if (num !== '' && num < 0) num = 0;
+      if (num !== '' && num > 100) num = 100;
+
+      setForm(f => ({ ...f, [name]: num }));
+      return;
+    }
     setForm(f => ({ ...f, [name]: value }));
   };
 
@@ -148,11 +168,37 @@ export default function AddMarks() {
                 <label className="block mb-2 font-semibold text-gray-700">Marks<span className="text-red-500">*</span></label>
                 <input
                   type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400 ${formErrors.marks ? 'border-red-500' : 'border-gray-300'}`}
                   placeholder="e.g. 85"
                   name="marks"
                   value={form.marks}
                   onChange={handleChange}
+                  onInput={(e) => {
+                    // Ensure value stays numeric and within range while typing
+                    const v = e.currentTarget.value.replace(/[^0-9]/g, '');
+                    if (v === '') return;
+                    let n = parseInt(v, 10);
+                    if (Number.isNaN(n)) n = '';
+                    if (n !== '' && n > 100) n = 100;
+                    if (n !== '' && n < 0) n = 0;
+                    if (n !== '' && n.toString() !== e.currentTarget.value) {
+                      e.currentTarget.value = n;
+                      // Sync to state
+                      setForm(f => ({ ...f, marks: n }));
+                    }
+                  }}
+                  onPaste={(e) => {
+                    const paste = (e.clipboardData || window.clipboardData).getData('text');
+                    if (!/^[0-9]+$/.test(paste)) {
+                      e.preventDefault();
+                      return;
+                    }
+                    const n = Math.min(100, Math.max(0, parseInt(paste, 10)));
+                    e.preventDefault();
+                    setForm(f => ({ ...f, marks: n }));
+                  }}
                   required
                   min={0}
                   max={100}
