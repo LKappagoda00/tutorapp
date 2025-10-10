@@ -35,6 +35,7 @@ export default function Sidebar({ role }) {
       { label: "Mark Analysis", to: "/marks-analysis", icon: BarChart2 },
       { label: "profile", to: "/student-profile", icon: BookOpen },
       { label: "Payment", to: "/student-payment", icon: DollarSign },
+      { label: "Library", to: "/library", icon: Library },
     
       { label: "Book Session", to: "/instructors", icon: Users},
       

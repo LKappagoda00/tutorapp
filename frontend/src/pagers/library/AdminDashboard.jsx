@@ -619,25 +619,31 @@ const AdminDashboard = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 py-8 px-4">
-        <div className="max-w-7xl mx-auto px-6">
+      <div className="min-h-screen px-4 py-8 bg-gradient-to-br from-slate-50 to-slate-200">
+        <div className="px-6 mx-auto max-w-7xl">
         {/* Header */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 mb-10 border border-white/90">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div className="p-8 mb-10 border shadow-2xl bg-white/80 backdrop-blur-xl rounded-3xl border-white/90">
+          <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <div>
-              <h1 className="text-4xl font-bold text-slate-800 mb-2">Admin Dashboard</h1>
-              <p className="text-slate-600 text-lg">Manage your library resources</p>
+              <h1 className="mb-2 text-4xl font-bold text-slate-800">Admin Dashboard</h1>
+              <p className="text-lg text-slate-600">Manage your library resources</p>
             </div>
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex flex-wrap gap-3">
               <button 
                 onClick={() => window.open("http://localhost:5000/api/resources/export/excel", "_blank")}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="px-6 py-3 font-semibold text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl hover:scale-105 hover:shadow-xl"
               >
                 📊 Export Excel Sheet
               </button>
               <button 
+                onClick={() => window.open("http://localhost:5000/api/resources/export/pdf", "_blank")}
+                className="px-6 py-3 font-semibold text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl hover:scale-105 hover:shadow-xl"
+              >
+                📄 Export PDF Report
+              </button>
+              <button 
                 onClick={testConnection} 
-                className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                className="px-6 py-3 font-semibold text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-xl hover:scale-105 hover:shadow-xl"
               >
                 🧪 Test Connection
               </button>
@@ -645,78 +651,78 @@ const AdminDashboard = () => {
           </div>
           
           <div className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200/50">
-                <div className="text-3xl font-bold text-blue-700 mb-2">{resources.length}</div>
-                <div className="text-blue-600 font-medium">Total Resources</div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="p-6 border bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-blue-200/50">
+                <div className="mb-2 text-3xl font-bold text-blue-700">{resources.length}</div>
+                <div className="font-medium text-blue-600">Total Resources</div>
               </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border border-green-200/50">
-                <div className="text-3xl font-bold text-green-700 mb-2">
+              <div className="p-6 border bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-green-200/50">
+                <div className="mb-2 text-3xl font-bold text-green-700">
                   {resources.reduce((sum, r) => sum + (r.views || 0), 0)}
                 </div>
-                <div className="text-green-600 font-medium">Total Views</div>
+                <div className="font-medium text-green-600">Total Views</div>
               </div>
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200/50">
-                <div className="text-3xl font-bold text-purple-700 mb-2">
+              <div className="p-6 border bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border-purple-200/50">
+                <div className="mb-2 text-3xl font-bold text-purple-700">
                   {new Set(resources.map(r => r.tag)).size}
                 </div>
-                <div className="text-purple-600 font-medium">Unique Tags</div>
+                <div className="font-medium text-purple-600">Unique Tags</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Resources Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3">
           {resources.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center py-20 text-center">
-              <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl p-12 mb-6 shadow-xl">
-                <div className="text-6xl mb-4">📚</div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-3">No resources yet</h3>
-                <p className="text-slate-600 text-lg">Start by uploading some resources to your library</p>
+            <div className="flex flex-col items-center py-20 text-center col-span-full">
+              <div className="p-12 mb-6 shadow-xl bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl">
+                <div className="mb-4 text-6xl">📚</div>
+                <h3 className="mb-3 text-2xl font-bold text-slate-800">No resources yet</h3>
+                <p className="text-lg text-slate-600">Start by uploading some resources to your library</p>
               </div>
             </div>
           ) : (
             resources.map((r) => (
-              <div key={r._id} className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/90 transition-all duration-500 hover:shadow-3xl hover:scale-105 hover:bg-white/95 overflow-hidden">
+              <div key={r._id} className="overflow-hidden transition-all duration-500 border shadow-2xl bg-white/90 backdrop-blur-xl rounded-3xl border-white/90 hover:shadow-3xl hover:scale-105 hover:bg-white/95">
                 {editingResource === r._id ? (
                   // Edit Form
                   <div className="p-8">
-                    <h3 className="text-2xl font-bold text-slate-800 mb-6">Edit Resource</h3>
+                    <h3 className="mb-6 text-2xl font-bold text-slate-800">Edit Resource</h3>
                     <div className="space-y-6">
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Title *</label>
+                        <label className="block mb-2 text-sm font-bold text-slate-700">Title *</label>
                         <input
                           type="text"
                           name="title"
                           value={editForm.title}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
+                          className="w-full px-4 py-3 transition-all duration-300 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
                           placeholder="Enter title"
                           required
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
+                        <label className="block mb-2 text-sm font-bold text-slate-700">Description</label>
                         <textarea
                           name="description"
                           value={editForm.description}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 resize-vertical"
+                          className="w-full px-4 py-3 transition-all duration-300 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 resize-vertical"
                           placeholder="Enter description"
                           rows="2"
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-2">Type *</label>
+                          <label className="block mb-2 text-sm font-bold text-slate-700">Type *</label>
                           <select
                             name="type"
                             value={editForm.type}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
+                            className="w-full px-4 py-3 transition-all duration-300 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
                             required
                           >
                             <option value="">Select Type</option>
@@ -727,13 +733,13 @@ const AdminDashboard = () => {
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-2">Tag *</label>
+                          <label className="block mb-2 text-sm font-bold text-slate-700">Tag *</label>
                           <input
                             type="text"
                             name="tag"
                             value={editForm.tag}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
+                            className="w-full px-4 py-3 transition-all duration-300 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
                             placeholder="Enter tag"
                             required
                           />
@@ -742,13 +748,13 @@ const AdminDashboard = () => {
 
                       {editForm.type === "video" && (
                         <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-2">Drive Link</label>
+                          <label className="block mb-2 text-sm font-bold text-slate-700">Drive Link</label>
                           <input
                             type="url"
                             name="driveLink"
                             value={editForm.driveLink}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300"
+                            className="w-full px-4 py-3 transition-all duration-300 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20"
                             placeholder="Enter Google Drive link"
                           />
                         </div>
@@ -756,12 +762,12 @@ const AdminDashboard = () => {
 
                       {/* {editForm.type === "virtual_book" && (
                         <div>
-                          <label className="block text-sm font-bold text-slate-700 mb-2">Content</label>
+                          <label className="block mb-2 text-sm font-bold text-slate-700">Content</label>
                           <textarea
                             name="content"
                             value={editForm.content}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 resize-vertical"
+                            className="w-full px-4 py-3 transition-all duration-300 border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 resize-vertical"
                             placeholder="Enter book content"
                             rows="4"
                           />
@@ -771,14 +777,14 @@ const AdminDashboard = () => {
                       <div className="flex gap-4 pt-6 border-t border-slate-200">
                         <button 
                           onClick={() => handleUpdate(r._id)}
-                          className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 px-6 py-3 font-bold text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-xl hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={updateLoading}
                         >
                           {updateLoading ? "⏳ Updating..." : "💾 Save Changes"}
                         </button>
                         <button 
                           onClick={handleCancelEdit}
-                          className="flex-1 px-6 py-3 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 px-6 py-3 font-bold text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 rounded-xl hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={updateLoading}
                         >
                           ❌ Cancel
@@ -789,7 +795,7 @@ const AdminDashboard = () => {
                 ) : (
                   // Display Mode
                   <div className="p-8">
-                    <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-start justify-between mb-6">
                       <div className="flex items-center space-x-3">
                         <span className="text-3xl">{getTypeIcon(r.type)}</span>
                         <h3 className="text-xl font-bold text-slate-800">{r.title}</h3>
@@ -808,15 +814,15 @@ const AdminDashboard = () => {
                     </div>
 
                     {r.description && (
-                      <p className="text-slate-600 mb-6 leading-relaxed">{r.description}</p>
+                      <p className="mb-6 leading-relaxed text-slate-600">{r.description}</p>
                     )}
 
                     <div className="flex flex-wrap gap-4 mb-6">
-                      <div className="flex items-center space-x-2 bg-blue-50 rounded-xl px-4 py-2 border border-blue-200">
+                      <div className="flex items-center px-4 py-2 space-x-2 border border-blue-200 bg-blue-50 rounded-xl">
                         <span>🏷️</span>
                         <span className="font-semibold text-blue-700">{r.tag}</span>
                       </div>
-                      <div className="flex items-center space-x-2 bg-green-50 rounded-xl px-4 py-2 border border-green-200">
+                      <div className="flex items-center px-4 py-2 space-x-2 border border-green-200 bg-green-50 rounded-xl">
                         <span>👁️</span>
                         <span className="font-semibold text-green-700">{r.views} views</span>
                       </div>
@@ -824,14 +830,14 @@ const AdminDashboard = () => {
 
                     {(r.driveLink || r.fileUrl) && (
                       <div className="mb-6">
-                        <div className="text-sm font-bold text-slate-700 mb-3">Links:</div>
+                        <div className="mb-3 text-sm font-bold text-slate-700">Links:</div>
                         <div className="space-y-2">
                           {r.driveLink && (
                             <a 
                               href={r.driveLink} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="block px-4 py-3 bg-gradient-to-r from-purple-100 to-purple-200 hover:from-purple-200 hover:to-purple-300 text-purple-700 font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border border-purple-200"
+                              className="block px-4 py-3 font-semibold text-purple-700 transition-all duration-300 transform border border-purple-200 bg-gradient-to-r from-purple-100 to-purple-200 hover:from-purple-200 hover:to-purple-300 rounded-xl hover:scale-105"
                             >
                               🔗 Google Drive Link
                             </a>
@@ -841,7 +847,7 @@ const AdminDashboard = () => {
                               href={`http://localhost:5000${r.fileUrl}`} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="block px-4 py-3 bg-gradient-to-r from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 text-red-700 font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 border border-red-200"
+                              className="block px-4 py-3 font-semibold text-red-700 transition-all duration-300 transform border border-red-200 bg-gradient-to-r from-red-100 to-red-200 hover:from-red-200 hover:to-red-300 rounded-xl hover:scale-105"
                             >
                               📄 View PDF File
                             </a>
@@ -853,14 +859,14 @@ const AdminDashboard = () => {
                     <div className="flex gap-3 pt-6 border-t border-slate-200">
                       <button 
                         onClick={() => handleEdit(r)}
-                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                        className="flex items-center px-6 py-3 space-x-2 font-bold text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl hover:scale-105 hover:shadow-xl"
                       >
                         <span>✏️</span>
                         <span>Edit</span>
                       </button>
                       <button 
                         onClick={() => handleDelete(r._id)}
-                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                        className="flex items-center px-6 py-3 space-x-2 font-bold text-white transition-all duration-300 transform shadow-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-xl hover:scale-105 hover:shadow-xl"
                       >
                         <span>🗑️</span>
                         <span>Delete</span>
