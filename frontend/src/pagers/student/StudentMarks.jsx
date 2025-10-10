@@ -1,24 +1,143 @@
 import React, { useEffect, useState } from 'react';
-import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import Sidebar from '../../components/Sidebar';
 import StudentProfile from './studentprofile.jsx';
 
 export default function StudentMarks() {
-  const handleDownloadExcel = () => {
-    const data = marks.map(m => ({
-      Teacher: m.teacher?.fullName || 'N/A',
-      Subject: m.teacher?.subject || 'N/A',
-      ExamType: m.examType,
-      Marks: m.marks,
-      Date: m.date ? new Date(m.date).toLocaleDateString() : '',
-      Note: m.specialNote || ''
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'MyMarks');
-    XLSX.writeFile(workbook, 'my_marks_report.xlsx');
+  const handleDownloadPDF = () => {
+    if (marks.length === 0) {
+      alert('No marks data available to export.');
+      return;
+    }
+
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      let yPosition = 20;
+      
+      // Get student info
+      const userRaw = localStorage.getItem('user');
+      const user = userRaw ? JSON.parse(userRaw) : {};
+      const studentName = user.fullName || user.userName || 'Student';
+      
+      // Header with background
+      doc.setFillColor(67, 56, 202); // Indigo color
+      doc.rect(0, 0, pageWidth, 40, 'F');
+      
+      // Title
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(20);
+      doc.text('STUDENT MARKS REPORT', pageWidth / 2, 15, { align: 'center' });
+      
+      // Student name
+      doc.setFontSize(12);
+      doc.text(`Student: ${studentName}`, pageWidth / 2, 25, { align: 'center' });
+      
+      // Date
+      doc.setFontSize(10);
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 32, { align: 'center' });
+      
+      yPosition = 50;
+      
+      // Reset text color
+      doc.setTextColor(0, 0, 0);
+      
+      // Summary Statistics
+      if (marks.length > 0) {
+        const totalMarks = marks.reduce((sum, m) => sum + (parseInt(m.marks) || 0), 0);
+        const averageMark = (totalMarks / marks.length).toFixed(1);
+        const highestMark = Math.max(...marks.map(m => parseInt(m.marks) || 0));
+        const passedSubjects = marks.filter(m => parseInt(m.marks) >= 50).length;
+        
+        // Statistics box
+        doc.setFillColor(239, 246, 255);
+        doc.rect(15, yPosition, pageWidth - 30, 25, 'F');
+        doc.setDrawColor(59, 130, 246);
+        doc.rect(15, yPosition, pageWidth - 30, 25, 'S');
+        
+        doc.setFontSize(12);
+        doc.setTextColor(30, 64, 175);
+        doc.text('SUMMARY STATISTICS', 20, yPosition + 8);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(55, 65, 81);
+        doc.text(`Total Assessments: ${marks.length}`, 20, yPosition + 16);
+        doc.text(`Average Mark: ${averageMark}%`, 20, yPosition + 21);
+        doc.text(`Highest Mark: ${highestMark}%`, 100, yPosition + 16);
+        doc.text(`Passed: ${passedSubjects}/${marks.length}`, 100, yPosition + 21);
+        
+        yPosition += 35;
+      }
+      
+      // Table Header
+      doc.setFontSize(14);
+      doc.setTextColor(67, 56, 202);
+      doc.text('MARKS DETAILS', 20, yPosition);
+      yPosition += 10;
+      
+      // Table header background
+      doc.setFillColor(67, 56, 202);
+      doc.rect(15, yPosition, pageWidth - 30, 10, 'F');
+      
+      // Table headers
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.text('#', 18, yPosition + 6);
+      doc.text('Teacher', 30, yPosition + 6);
+      doc.text('Subject', 70, yPosition + 6);
+      doc.text('Exam', 110, yPosition + 6);
+      doc.text('Mark', 140, yPosition + 6);
+      doc.text('Date', 160, yPosition + 6);
+      
+      yPosition += 12;
+      
+      // Table rows
+      doc.setTextColor(0, 0, 0);
+      marks.forEach((mark, index) => {
+        // Check if we need a new page
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        
+        // Alternate row background
+        if (index % 2 === 0) {
+          doc.setFillColor(248, 250, 252);
+          doc.rect(15, yPosition - 2, pageWidth - 30, 8, 'F');
+        }
+        
+        // Row data
+        doc.setFontSize(8);
+        doc.text((index + 1).toString(), 18, yPosition + 4);
+        doc.text((mark.teacher?.fullName || 'N/A').substring(0, 15), 30, yPosition + 4);
+        doc.text((mark.teacher?.subject || 'N/A').substring(0, 15), 70, yPosition + 4);
+        doc.text((mark.examType || 'N/A').substring(0, 10), 110, yPosition + 4);
+        doc.text(`${mark.marks}%`, 140, yPosition + 4);
+        doc.text(mark.date ? new Date(mark.date).toLocaleDateString() : 'N/A', 160, yPosition + 4);
+        
+        yPosition += 8;
+      });
+      
+      // Footer
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(107, 114, 128);
+        doc.text('Generated by Tutor App - Student Management System', pageWidth / 2, 285, { align: 'center' });
+        doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, 290, { align: 'center' });
+      }
+      
+      // Save the PDF
+      const fileName = `student_marks_${studentName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again. Error: ' + error.message);
+    }
   };
   const [marks, setMarks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -108,11 +227,11 @@ export default function StudentMarks() {
                 </select>
               </div>
               <button
-                className="px-5 py-2 font-bold text-white transition-all shadow bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl hover:scale-105"
-                onClick={handleDownloadExcel}
+                className="px-5 py-2 font-bold text-white transition-all shadow bg-gradient-to-r from-red-500 to-orange-500 rounded-xl hover:scale-105"
+                onClick={handleDownloadPDF}
                 disabled={marks.length === 0}
               >
-                Download Report
+                📄 Download PDF Report
               </button>
             </div>
 
