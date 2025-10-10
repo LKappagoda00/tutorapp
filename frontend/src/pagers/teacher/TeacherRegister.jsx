@@ -18,16 +18,39 @@ export default function TeacherRegister() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    // Prevent digits in fullName
+    if (name === 'fullName') {
+      const sanitized = value.replace(/[0-9]/g, '');
+      setForm((prev) => ({ ...prev, [name]: sanitized }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    // Field-level validation
+    const errors = {};
+    if (!form.fullName.trim() || form.fullName.trim().length < 2) {
+      errors.fullName = 'Full name must be at least 2 characters';
+    } else if (/\d/.test(form.fullName)) {
+      errors.fullName = 'Full name cannot include numbers';
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
 
     // Basic validation
     if (form.password !== form.confirmPassword) {
@@ -98,10 +121,23 @@ export default function TeacherRegister() {
                 type="text"
                 value={form.fullName}
                 onChange={handleChange}
+                onPaste={(e) => {
+                  const paste = (e.clipboardData || window.clipboardData).getData('text');
+                  if (/\d/.test(paste)) {
+                    e.preventDefault();
+                    const sanitized = paste.replace(/\d/g, '');
+                    const el = e.target;
+                    const start = el.selectionStart || 0;
+                    const end = el.selectionEnd || 0;
+                    const newVal = (form.fullName || '').slice(0, start) + sanitized + (form.fullName || '').slice(end);
+                    setForm(prev => ({ ...prev, fullName: newVal }));
+                  }
+                }}
                 className="w-full px-4 py-2 transition border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter your full name"
                 required
               />
+              {fieldErrors.fullName && <p className="mt-1 text-sm text-red-500">{fieldErrors.fullName}</p>}
             </div>
             <div>
               <label className="block mb-2 font-semibold text-gray-700" htmlFor="userName">User Name</label>

@@ -20,7 +20,17 @@ export default function StudentRegister() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    // If editing fullName, strip any digits immediately
+    if (name === 'fullName') {
+      const sanitized = value.replace(/[0-9]/g, '');
+      setForm((prev) => ({ ...prev, [name]: sanitized }));
+    } else if (name === 'phone') {
+      // Keep only digits for phone
+      const digits = value.replace(/[^0-9]/g, '');
+      setForm((prev) => ({ ...prev, [name]: digits }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
     
     // Clear field error when user starts typing
     if (fieldErrors[name]) {
@@ -37,8 +47,11 @@ export default function StudentRegister() {
     const errors = {};
     
     // Full Name validation
-    if (!form.fullName.trim() || form.fullName.trim().length < 2) {
+    const trimmedName = form.fullName.trim();
+    if (!trimmedName || trimmedName.length < 2) {
       errors.fullName = 'Full name must be at least 2 characters';
+    } else if (/\d/.test(form.fullName)) {
+      errors.fullName = 'Full name cannot include numbers';
     }
     
     // User Name validation
@@ -61,17 +74,21 @@ export default function StudentRegister() {
         errors.dob = 'Student must be at least 5 years old';
       }
     }
-    
+
     // Address validation
     if (!form.address.trim() || form.address.trim().length < 5) {
       errors.address = 'Address must be at least 5 characters';
     }
     
     // Phone validation
-    if (!form.phone.trim()) {
+    const phoneDigits = (form.phone || '').replace(/[^0-9]/g, '');
+    if (!phoneDigits) {
       errors.phone = 'Phone number is required';
-    } else if (!/^\d{10,}$/.test(form.phone.replace(/\s/g, ''))) {
-      errors.phone = 'Phone number must be at least 10 digits';
+    } else if (!/^\d{10,}$/.test(phoneDigits)) {
+      errors.phone = 'Phone number must contain at least 10 digits';
+    } else if (phoneDigits !== form.phone) {
+      // If non-digit characters were present (should be sanitized on change), show error
+      errors.phone = 'Phone number must contain only digits';
     }
     
     // Password validation
@@ -161,14 +178,28 @@ export default function StudentRegister() {
                 type="text"
                 value={form.fullName}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
-                  fieldErrors.fullName 
-                    ? 'border-red-500 focus:ring-red-400' 
-                    : 'border-gray-300 focus:ring-blue-400'
-                }`}
-                placeholder="Enter your full name"
-                required
-              />
+                onPaste={(e) => {
+                  // Prevent pasted content with digits; sanitize and append
+                  const paste = (e.clipboardData || window.clipboardData).getData('text');
+                  if (/\d/.test(paste)) {
+                    e.preventDefault();
+                    const sanitized = paste.replace(/\d/g, '');
+                    // Append sanitized paste at cursor position if possible
+                    const el = e.target;
+                    const start = el.selectionStart || 0;
+                    const end = el.selectionEnd || 0;
+                    const newVal = (form.fullName || '').slice(0, start) + sanitized + (form.fullName || '').slice(end);
+                    setForm(prev => ({ ...prev, fullName: newVal }));
+                  }
+                }}
+                 className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
+                   fieldErrors.fullName 
+                     ? 'border-red-500 focus:ring-red-400' 
+                     : 'border-gray-300 focus:ring-blue-400'
+                 }`}
+                 placeholder="Enter your full name"
+                 required
+               />
               {fieldErrors.fullName && (
                 <p className="mt-1 text-sm text-red-500">{fieldErrors.fullName}</p>
               )}
@@ -201,6 +232,7 @@ export default function StudentRegister() {
                 type="date"
                 value={form.dob}
                 onChange={handleChange}
+                max={new Date().toISOString().split('T')[0]}
                 className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
                   fieldErrors.dob 
                     ? 'border-red-500 focus:ring-red-400' 
@@ -240,6 +272,17 @@ export default function StudentRegister() {
                 type="tel"
                 value={form.phone}
                 onChange={handleChange}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onPaste={(e) => {
+                  const paste = (e.clipboardData || window.clipboardData).getData('text');
+                  const digits = paste.replace(/[^0-9]/g, '');
+                  if (digits !== paste) {
+                    e.preventDefault();
+                    // Insert sanitized digits
+                    setForm(prev => ({ ...prev, phone: (prev.phone || '') + digits }));
+                  }
+                }}
                 className={`w-full px-4 py-2 transition border rounded-lg shadow focus:outline-none focus:ring-2 ${
                   fieldErrors.phone 
                     ? 'border-red-500 focus:ring-red-400' 
